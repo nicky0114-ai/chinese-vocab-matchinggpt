@@ -143,21 +143,31 @@ function seconds(s) {
 
 function getAllLessons(state) {
   const s = state || read();
-  const merged = { ...getStoredLessons(), ...(s.lessons || {}) };
-  return Object.values(merged);
+  const local = getStoredLessons();
+  let server = s.lessons || {};
+  if (Array.isArray(server)) {
+    const obj = {};
+    server.forEach(item => { if (item && item.id) obj[item.id] = item; });
+    server = obj;
+  }
+  const merged = { ...defaultLessons, ...local, ...server };
+  return Object.values(merged).filter(l => l && l.id && l.title);
 }
 
 function getActiveLesson(state) {
   const s = state || read();
-  const lessonsMap = { ...getStoredLessons(), ...(s.lessons || {}) };
-  return lessonsMap[s.currentLessonId] || lessonsMap['l2'] || defaultLesson;
+  const all = getAllLessons(s);
+  const targetId = s.currentLessonId;
+  return all.find(l => l.id === targetId) || all.find(l => l.id === 'l3') || all.find(l => l.id === 'l2') || all[0] || defaultLesson;
 }
 
 function activeWord(state) {
   const lesson = getActiveLesson(state);
   const words = (lesson && lesson.words && lesson.words.length) ? lesson.words : defaultLesson.words;
-  return words[state.wordIndex] || words[0];
+  const idx = (state && state.wordIndex >= 0 && state.wordIndex < words.length) ? state.wordIndex : 0;
+  return words[idx] || words[0];
 }
+
 
 function parseLineForTermMeaning(line) {
   const cleaned = line.replace(/^\s*(?:[0-9]+\.|\([0-9]+\)|[①-⑩]|[\u4e00-\u4e5d]、|[•\-\*])\s*/, '').trim();
@@ -316,14 +326,23 @@ function teacherApp() {
     wordSelect = document.querySelector('#wordSelect'),
     timeSelect = document.querySelector('#timeSelect');
 
+  let lastLessonKey = '';
+  let lastWordKey = '';
+
   function populateLessons() {
     const s = read();
     const lessons = getAllLessons(s);
-    lessonSelect.innerHTML = lessons.map(l => `<option value="${l.id}">${l.title}</option>`).join('');
-    if (s.currentLessonId && lessons.some(l => l.id === s.currentLessonId)) {
-      lessonSelect.value = s.currentLessonId;
-    } else if (lessons.length > 0) {
-      lessonSelect.value = lessons[0].id;
+    if (!lessons.length) return;
+
+    const currentKey = lessons.map(l => `${l.id}:${l.title}`).join('|');
+    if (currentKey !== lastLessonKey || lessonSelect.options.length === 0) {
+      lastLessonKey = currentKey;
+      lessonSelect.innerHTML = lessons.map(l => `<option value="${l.id}">${l.title}</option>`).join('');
+    }
+
+    const activeLesson = getActiveLesson(s);
+    if (lessonSelect.value !== activeLesson.id && lessons.some(l => l.id === activeLesson.id)) {
+      lessonSelect.value = activeLesson.id;
     }
   }
 
@@ -331,10 +350,21 @@ function teacherApp() {
     const s = read();
     const lesson = getActiveLesson(s);
     const words = (lesson && lesson.words && lesson.words.length) ? lesson.words : [];
-    wordSelect.innerHTML = words.map((w, i) => `<option value="${i}">【${w.char}】字生字配對 (${(w.terms || []).length}詞)</option>`).join('');
-    wordSelect.value = (s.wordIndex < words.length) ? s.wordIndex : 0;
+    if (!words.length) return;
+
+    const currentKey = lesson.id + '::' + words.map(w => w.char).join(',');
+    if (currentKey !== lastWordKey || wordSelect.options.length === 0) {
+      lastWordKey = currentKey;
+      wordSelect.innerHTML = words.map((w, i) => `<option value="${i}">【${w.char}】字生字配對 (${(w.terms || []).length}詞)</option>`).join('');
+    }
+
+    const targetIndex = (s.wordIndex >= 0 && s.wordIndex < words.length) ? s.wordIndex : 0;
+    if (wordSelect.value != targetIndex) {
+      wordSelect.value = targetIndex;
+    }
     timeSelect.value = s.duration || 60;
   }
+
 
   populateLessons();
   populateWords();
