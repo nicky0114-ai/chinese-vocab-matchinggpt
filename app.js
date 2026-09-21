@@ -1,4 +1,11 @@
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js';
+import { getDatabase, onValue, ref, runTransaction } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js';
+import { firebaseConfig } from './firebase-config.js';
+
 const ROOM_KEY = 'vocab-bright-room-v1';
+const firebaseApp = initializeApp(firebaseConfig);
+const database = getDatabase(firebaseApp);
+const roomRef = ref(database, 'vocab_rooms/room603/state');
 const GROUPS = 7;
 const lesson = {id:'l2', title:'六年級國語 L2', words:[
  {char:'裁',terms:[['裁縫','裁剪並縫製衣服，或指從事這種工作的人。'],['裁員','因業務縮減而減少工作人員。'],['裁判','體育比賽中負責評判勝負的司法人员。'],['體裁','詩歌、散文、小說等文章的寫作樣式或結構。'],['獨裁','獨自掌握政治權力，實行專制統治。'],['獨出心裁','比喻構思獨特，與眾不同。']]},
@@ -7,11 +14,14 @@ const lesson = {id:'l2', title:'六年級國語 L2', words:[
  {char:'免',terms:[['避免','防止、設法使不發生。'],['免稅','免除應繳納的稅金。'],['免除','省去、撤除。'],['免費','不收取費用。'],['在所難免','無論如何很難免除、避免。']]}
 ]};
 function baseState(){return {command:'waiting',wordIndex:0,duration:60,endsAt:null,presence:{},answers:{},updatedAt:Date.now()}}
-function read(){try{return JSON.parse(localStorage.getItem(ROOM_KEY))||baseState()}catch{return baseState()}}
-function write(next){next.updatedAt=Date.now();localStorage.setItem(ROOM_KEY,JSON.stringify(next));if(channel)channel.postMessage(next);window.dispatchEvent(new Event('roomchange'))}
+let roomState=(()=>{try{return JSON.parse(localStorage.getItem(ROOM_KEY))||baseState()}catch{return baseState()}})();
+function read(){return structuredClone(roomState)}
+function notify(){localStorage.setItem(ROOM_KEY,JSON.stringify(roomState));if(channel)channel.postMessage(roomState);window.dispatchEvent(new Event('roomchange'))}
+function write(next){next.updatedAt=Date.now();roomState=next;notify();runTransaction(roomRef,current=>{const prior=current||baseState();const shouldClearAnswers=(next.command==='waiting'||next.command==='stopped'||(next.command==='playing'&&Object.keys(next.answers||{}).length===0))&&Object.keys(next.answers||{}).length===0;return {...prior,...next,presence:{...(prior.presence||{}),...(next.presence||{})},answers:shouldClearAnswers?{}:{...(prior.answers||{}),...(next.answers||{})}}}).catch(()=>{document.querySelectorAll('.cloud-status').forEach(el=>el.textContent='● Firebase 連線失敗，使用本機暫存')})}
 const channel='BroadcastChannel' in window?new BroadcastChannel(ROOM_KEY):null;
 channel?.addEventListener('message',()=>window.dispatchEvent(new Event('roomchange')));
 window.addEventListener('storage',e=>{if(e.key===ROOM_KEY)window.dispatchEvent(new Event('roomchange'))});
+onValue(roomRef,snapshot=>{roomState={...baseState(),...(snapshot.val()||{})};notify();document.querySelectorAll('.cloud-status').forEach(el=>el.textContent='● Firebase 即時同步已連線')},()=>{document.querySelectorAll('.cloud-status').forEach(el=>el.textContent='● Firebase 連線失敗，使用本機暫存')});
 function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
 function seconds(s){if(!s||s<0)return '--:--';return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(Math.ceil(s%60)).padStart(2,'0')}`}
 function activeWord(state){return lesson.words[state.wordIndex]||lesson.words[0]}

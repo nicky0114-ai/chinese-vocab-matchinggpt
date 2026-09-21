@@ -16,5 +16,5 @@
 </main>
 <dialog id="teacherLogin" class="login-dialog"><form id="teacherLoginForm"><span class="brand-mark">字</span><p class="eyebrow">教師專區</p><h2>請輸入主控密碼</h2><p class="muted">僅教師可發布任務與檢視全班結果。</p><input id="teacherPassword" type="password" inputmode="numeric" maxlength="4" autocomplete="current-password" placeholder="請輸入 4 碼密碼" autofocus><p id="loginError" class="login-error" aria-live="polite"></p><button class="button success" type="submit">進入教師主控台</button></form></dialog>
 <dialog id="importDialog" class="import-dialog"><form method="dialog"><div class="import-title"><span class="brand-mark">PDF</span><div><p class="eyebrow">建立新課別</p><h2>匯入生字教材 PDF</h2></div></div><p class="muted">選取教材後，會建立待校對課別，接著確認生字、語詞、詞義與成語。</p><label class="file-drop" for="pdfInput"><span>📄</span><strong>選擇 PDF 檔案</strong><small>支援國語生字教材 PDF</small><input id="pdfInput" type="file" accept="application/pdf,.pdf"></label><p id="pdfName" class="pdf-name">尚未選擇檔案</p><label class="import-field">課別名稱<input id="importLessonName" placeholder="例如：六年級國語 L2"></label><div class="import-actions"><button id="createImportBtn" type="button" class="button success" disabled>下一步：校對題庫</button><button class="quiet" value="cancel">取消</button></div></form></dialog>
-<script src="app.js"></script></body>
+<script type="module" src="app.js"></script></body>
 </html>
