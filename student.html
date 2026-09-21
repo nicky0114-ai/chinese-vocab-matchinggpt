@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>學生闖關｜生字語詞</title><link rel="stylesheet" href="styles.css"></head>
+<body data-page="student">
+<header class="topbar"><a class="brand" href="index.html"><span class="brand-mark">字</span><span>生字語詞小組配對<small>學生平板端</small></span></a><span id="studentStatus" class="cloud-status">● 等待加入小組</span></header>
+<main class="student-main"><section class="student-hero"><div><p class="eyebrow">📚 本課生字</p><div id="wordChips" class="word-chips"></div></div></section>
+  <section id="taskPanel" class="task-panel locked"><div class="task-title"><div id="charBadge" class="char-badge">?</div><div><h1 id="taskTitle">已進入房間，等待老師開始</h1><p id="taskHint" class="muted">請先選擇組別，並留意教師大螢幕。</p></div><div id="studentTimer" class="countdown small">--:--</div></div><div class="matching-head"><span>✏️ 語詞卡片（點擊選擇）</span><span>📖 詞義解釋卡片（點擊對應）</span></div><div id="matchingGrid" class="matching-grid"></div><p id="feedback" class="feedback"></p></section>
+</main>
+<dialog id="groupDialog"><form method="dialog"><span class="brand-mark">字</span><h2>歡迎加入闖關</h2><p>請選擇您所在的小組。</p><div id="groupChoices" class="group-choices"></div><button value="cancel" class="quiet dialog-cancel">稍後再選</button></form></dialog>
+<script src="app.js"></script></body>
+</html>

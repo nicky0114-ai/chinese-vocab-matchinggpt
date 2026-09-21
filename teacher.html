@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>教師主控台｜生字語詞闖關</title><link rel="stylesheet" href="styles.css"></head>
+<body data-page="teacher">
+<header class="topbar"><a class="brand" href="index.html"><span class="brand-mark">字</span><span>生字語詞限時闖關<small>教師主控與檢討大螢幕</small></span></a><span class="cloud-status">● 本機同步測試模式</span></header>
+<main class="teacher-main">
+  <section class="control-panel"><div><p class="eyebrow">🎮 全班課堂廣播主控台</p><h1>派送任務，開始全班挑戰</h1><p class="muted">先選課別、生字與作答時間；開始後，所有已連線平板會同步解鎖。</p></div>
+    <div class="controls"><label>課別<select id="lessonSelect"></select></label><label>挑戰生字<select id="wordSelect"></select></label><label>作答時間<select id="timeSelect"><option value="30">30 秒</option><option value="45">45 秒</option><option value="60" selected>60 秒</option><option value="90">90 秒</option><option value="120">120 秒</option></select></label><button id="importBtn" class="import-button">＋ 匯入 PDF 教材</button></div>
+    <div class="action-row"><button id="startBtn" class="button success">▶ 發布並開始作答</button><button id="stopBtn" class="button danger">■ 強制結束作答</button><button id="resetBtn" class="button quiet">↻ 重置本字</button></div>
+    <div><p class="status-label">各組連線狀態</p><div id="presence" class="presence-list"></div></div>
+  </section>
+  <section id="importReview" class="import-review" hidden><div class="review-toolbar"><div><p class="eyebrow">PDF 匯入校對</p><h2 id="importReviewTitle">待校對課別</h2><p id="importReviewStatus" class="muted">正在準備教材內容。</p></div><button id="saveImportBtn" class="button success">儲存為課別題庫</button></div><div id="extractedWords" class="extracted-words"></div><details><summary>檢視／修正擷取文字</summary><textarea id="extractedText" rows="12" placeholder="PDF 的文字會顯示在這裡；若是掃描檔，請在此貼上文字或手動建立生字。"></textarea></details></section>
+  <section class="review-heading"><div><p class="eyebrow">即時檢討</p><h2 id="reviewTitle">等待派送任務</h2><p id="reviewSub" class="muted">學生連線後，這裡會顯示各組的作答結果。</p></div><div id="countdown" class="countdown">--:--</div></section>
+  <section id="insight" class="insight"><span>🔎</span><div><strong>課堂檢討提示</strong><p>開始後，系統會自動整理最常被混淆的語詞。</p></div></section>
+  <section id="groupGrid" class="group-grid"></section>
+</main>
+<dialog id="teacherLogin" class="login-dialog"><form id="teacherLoginForm"><span class="brand-mark">字</span><p class="eyebrow">教師專區</p><h2>請輸入主控密碼</h2><p class="muted">僅教師可發布任務與檢視全班結果。</p><input id="teacherPassword" type="password" inputmode="numeric" maxlength="4" autocomplete="current-password" placeholder="請輸入 4 碼密碼" autofocus><p id="loginError" class="login-error" aria-live="polite"></p><button class="button success" type="submit">進入教師主控台</button></form></dialog>
+<dialog id="importDialog" class="import-dialog"><form method="dialog"><div class="import-title"><span class="brand-mark">PDF</span><div><p class="eyebrow">建立新課別</p><h2>匯入生字教材 PDF</h2></div></div><p class="muted">選取教材後，會建立待校對課別，接著確認生字、語詞、詞義與成語。</p><label class="file-drop" for="pdfInput"><span>📄</span><strong>選擇 PDF 檔案</strong><small>支援國語生字教材 PDF</small><input id="pdfInput" type="file" accept="application/pdf,.pdf"></label><p id="pdfName" class="pdf-name">尚未選擇檔案</p><label class="import-field">課別名稱<input id="importLessonName" placeholder="例如：六年級國語 L2"></label><div class="import-actions"><button id="createImportBtn" type="button" class="button success" disabled>下一步：校對題庫</button><button class="quiet" value="cancel">取消</button></div></form></dialog>
+<script src="app.js"></script></body>
+</html>
