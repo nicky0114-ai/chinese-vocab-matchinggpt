@@ -127,6 +127,54 @@ function activeWord(state) {
   return words[state.wordIndex] || words[0];
 }
 
+function parseLineForTermMeaning(line) {
+  const cleaned = line.replace(/^\s*(?:[0-9]+\.|\([0-9]+\)|[①-⑩]|[\u4e00-\u4e5d]、|[•\-\*])\s*/, '').trim();
+  if (!cleaned) return null;
+
+  if (/^(生字|注音|釋義|語詞|成語|造句|名稱|意思|解釋)\s*[：:]?$/.test(cleaned) || /^【.*】$/.test(cleaned)) {
+    return null;
+  }
+
+  const colonMatch = cleaned.match(/^([^\s：:]+)\s*[：:]\s*(.+)$/);
+  if (colonMatch) {
+    const rawTerm = colonMatch[1].trim();
+    const meaning = colonMatch[2].trim();
+    if (!['生字', '注音與釋義', '注音', '釋義', '語詞', '成語', '名稱', '意思', '解釋', '造句'].includes(rawTerm)) {
+      const cleanTerm = rawTerm.replace(/[\u3100-\u312f\u02ca\u02c7\u02cb\u02d9]+/g, '').trim();
+      if (cleanTerm && meaning) return { term: cleanTerm, meaning };
+    }
+  }
+
+  const parenMatch = cleaned.match(/^([^\s（(]+)\s*[（(]([^）)]+)[）)]$/);
+  if (parenMatch) {
+    const rawTerm = parenMatch[1].trim();
+    const meaning = parenMatch[2].trim();
+    if (!['生字', '注音與釋義', '注音', '釋義', '語詞', '成語', '名稱', '意思', '解釋', '造句'].includes(rawTerm)) {
+      const cleanTerm = rawTerm.replace(/[\u3100-\u312f\u02ca\u02c7\u02cb\u02d9]+/g, '').trim();
+      if (cleanTerm && meaning) return { term: cleanTerm, meaning };
+    }
+  }
+
+  const dashMatch = cleaned.match(/^([^\s\-—=]+)\s*[\-—=]\s*(.+)$/);
+  if (dashMatch) {
+    const rawTerm = dashMatch[1].trim();
+    const meaning = dashMatch[2].trim();
+    if (!['生字', '注音與釋義', '注音', '釋義', '語詞', '成語', '名稱', '意思', '解釋', '造句'].includes(rawTerm)) {
+      const cleanTerm = rawTerm.replace(/[\u3100-\u312f\u02ca\u02c7\u02cb\u02d9]+/g, '').trim();
+      if (cleanTerm && meaning) return { term: cleanTerm, meaning };
+    }
+  }
+
+  const spaceMatch = cleaned.match(/^([\u3400-\u9fff]{2,8})\s{2,}(.+)$/);
+  if (spaceMatch) {
+    const cleanTerm = spaceMatch[1].trim();
+    const meaning = spaceMatch[2].trim();
+    if (cleanTerm && meaning) return { term: cleanTerm, meaning };
+  }
+
+  return null;
+}
+
 function parseTextToLesson(title, text) {
   const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
   const wordsMap = new Map();
@@ -134,7 +182,9 @@ function parseTextToLesson(title, text) {
   let currentIdiomName = null;
 
   for (let line of lines) {
-    const charMatch = line.match(/^生字\s*[：:]\s*([\u3400-\u9fff])/) || line.match(/^【\s*([\u3400-\u9fff])\s*】/);
+    const charMatch = line.match(/^生字\s*[：:\s]\s*([\u3400-\u9fff])/) ||
+                      line.match(/^【\s*([\u3400-\u9fff])\s*】/) ||
+                      line.match(/^字\s*[：:\s]\s*([\u3400-\u9fff])/);
     if (charMatch) {
       currentChar = charMatch[1];
       if (!wordsMap.has(currentChar)) {
@@ -153,37 +203,38 @@ function parseTextToLesson(title, text) {
       continue;
     }
 
-    if (!currentChar) continue;
-    const wordObj = wordsMap.get(currentChar);
-
-    const idiomNameMatch = line.match(/^名稱\s*[：:]\s*(.+)$/);
+    const idiomNameMatch = line.match(/^(?:名稱|成語)\s*[：:]\s*(.+)$/);
     if (idiomNameMatch) {
-      currentIdiomName = idiomNameMatch[1].trim();
+      currentIdiomName = idiomNameMatch[1].trim().replace(/[\u3100-\u312f\u02ca\u02c7\u02cb\u02d9]+/g, '');
       continue;
     }
 
-    const idiomMeanMatch = line.match(/^意思\s*[：:]\s*(.+)$/);
-    if (idiomMeanMatch && currentIdiomName) {
-      const meaning = idiomMeanMatch[1].trim();
-      if (!wordObj.terms.some(t => t[0] === currentIdiomName)) {
-        wordObj.terms.push([currentIdiomName, meaning]);
+    const idiomMeanMatch = line.match(/^(?:意思|解釋|釋義)\s*[：:]\s*(.+)$/);
+    if (idiomMeanMatch && currentIdiomName && currentChar) {
+      const wordObj = wordsMap.get(currentChar);
+      if (wordObj) {
+        const meaning = idiomMeanMatch[1].trim();
+        if (!wordObj.terms.some(t => t[0] === currentIdiomName)) {
+          wordObj.terms.push([currentIdiomName, meaning]);
+        }
       }
       currentIdiomName = null;
       continue;
     }
 
-    if (/^(注音|釋義|語詞|成語|造句)\s*[：:]?/.test(line) || /^【.*】/.test(line)) {
-      continue;
-    }
+    const parsedPair = parseLineForTermMeaning(line);
+    if (parsedPair) {
+      if (!currentChar && /^[\u3400-\u9fff]/.test(parsedPair.term)) {
+        currentChar = parsedPair.term[0];
+        if (!wordsMap.has(currentChar)) {
+          wordsMap.set(currentChar, { char: currentChar, terms: [] });
+        }
+      }
 
-    const termMatch = line.match(/^(?:[0-9]+\.|\([0-9]+\)|[①-⑩]|[\u4e00-\u4e5d]、)?\s*([^\s：:]+)\s*[：:]\s*(.+)$/);
-    if (termMatch) {
-      const rawTerm = termMatch[1].trim();
-      const meaning = termMatch[2].trim();
-      if (!['生字', '注音與釋義', '注音', '釋義', '語詞', '成語', '名稱', '意思', '造句'].includes(rawTerm)) {
-        const cleanTerm = rawTerm.replace(/[\u3100-\u312f\u02ca\u02c7\u02cb\u02d9]+/g, '').trim();
-        if (cleanTerm && meaning && !wordObj.terms.some(t => t[0] === cleanTerm)) {
-          wordObj.terms.push([cleanTerm, meaning]);
+      if (currentChar && wordsMap.has(currentChar)) {
+        const wordObj = wordsMap.get(currentChar);
+        if (!wordObj.terms.some(t => t[0] === parsedPair.term)) {
+          wordObj.terms.push([parsedPair.term, parsedPair.meaning]);
         }
       }
     }
@@ -191,7 +242,7 @@ function parseTextToLesson(title, text) {
 
   const words = Array.from(wordsMap.values()).map(w => {
     if (!w.terms || w.terms.length === 0) {
-      w.terms = [[w.char + '字配對', '請確認或補充此生字之語詞與詞義']];
+      w.terms = [[w.char + '字', '請在校對文字中補充【語詞：詞義解釋】']];
     }
     return w;
   });
@@ -282,6 +333,34 @@ function teacherApp() {
     extractedWords = document.querySelector('#extractedWords'),
     extractedText = document.querySelector('#extractedText');
 
+  function updateReviewCards() {
+    const name = importReviewTitle.textContent || '待校對課別';
+    const text = extractedText.value;
+    if (!text.trim()) {
+      extractedWords.innerHTML = '<p class="muted">尚未貼上或校對文字。</p>';
+      return;
+    }
+    const parsed = parseTextToLesson(name, text);
+    if (parsed.words.length) {
+      extractedWords.innerHTML = parsed.words.map(w =>
+        `<article class="extracted-word">
+          <strong>${w.char}</strong>
+          <p>已解析 <strong>${w.terms.length}</strong> 個語詞<br>
+          <small>${w.terms.map(t => `<span class="term-tag">${t[0]}</span>`).join(' ')}</small>
+          </p>
+        </article>`
+      ).join('');
+      const totalTerms = parsed.words.reduce((acc, w) => acc + w.terms.length, 0);
+      importReviewStatus.textContent = `即時校對：已解析 ${parsed.words.length} 個生字與 ${totalTerms} 個語詞！確認無誤後請點擊「儲存為課別題庫」。`;
+    } else {
+      extractedWords.innerHTML = '<p class="muted">未能辨識生字格式。請確保文字包含「生字：字」或「語詞：解釋」。</p>';
+      importReviewStatus.textContent = '未能辨識生字格式，請在下方文字區輸入如「生字：皆」或「皆大歡喜：大家都很滿意」。';
+    }
+  }
+
+  extractedText.oninput = updateReviewCards;
+  extractedText.onchange = updateReviewCards;
+
   document.querySelector('#importBtn').onclick = () => importDialog.showModal();
 
   pdfInput.onchange = () => {
@@ -313,16 +392,7 @@ function teacherApp() {
         text += content.items.map(item => item.str).join(' ') + '\n';
       }
       extractedText.value = text;
-      const parsed = parseTextToLesson(name, text);
-      if (parsed.words.length) {
-        extractedWords.innerHTML = parsed.words.map(w =>
-          `<article class="extracted-word"><strong>${w.char}</strong><p>偵測到 ${w.terms.length} 個語詞配對<br><small>${w.terms.map(t => t[0]).slice(0, 3).join('、')}${w.terms.length > 3 ? '…' : ''}</small></p></article>`
-        ).join('');
-        importReviewStatus.textContent = `已完成 ${pdf.numPages} 頁文字擷取，成功解析到 ${parsed.words.length} 個生字與對應語詞！請點擊「儲存為課別題庫」。`;
-      } else {
-        extractedWords.innerHTML = '<p class="muted">尚未辨識到固定格式生字，請在下方文字區校對或手動輸入。</p>';
-        importReviewStatus.textContent = `已完成 ${pdf.numPages} 頁文字擷取。未自動偵測到生字格式，請在下方貼上或校對文字。`;
-      }
+      updateReviewCards();
     } catch (error) {
       importReviewStatus.textContent = '此 PDF 無法自動擷取文字（可能為掃描檔或網路未連線）。請在下方貼上文字後校對。';
     }
@@ -337,6 +407,7 @@ function teacherApp() {
       return;
     }
     const newLesson = parseTextToLesson(title, text);
+    const totalTerms = newLesson.words.reduce((acc, w) => acc + w.terms.length, 0);
 
     const currentLessons = getStoredLessons();
     currentLessons[newLesson.id] = newLesson;
@@ -353,9 +424,12 @@ function teacherApp() {
     populateLessons();
     populateWords();
 
-    alert(`🎉 已成功儲存課別【${newLesson.title}】！\n共匯入 ${newLesson.words.length} 個生字題庫，已自動切換為當前派送課別。`);
-    importReviewStatus.textContent = `✅ 已成功儲存為課別【${newLesson.title}】（包含 ${newLesson.words.length} 個生字），可以在上方「課別」下拉選單中切換與發布！`;
+    alert(`🎉 已成功將校對資料轉為課別【${newLesson.title}】！\n共包含 ${newLesson.words.length} 個生字與 ${totalTerms} 個語詞配對，已自動切換為當前派送課別。`);
+    importReviewStatus.textContent = `✅ 已將校對資料轉為可派送課別【${newLesson.title}】（${newLesson.words.length}個生字、${totalTerms}個語詞），已切換至主控台！`;
+    
+    document.querySelector('.control-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
+
 
   document.querySelector('#startBtn').onclick = () => {
     const s = read();
