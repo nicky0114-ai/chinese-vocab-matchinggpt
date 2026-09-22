@@ -52,14 +52,23 @@ const defaultLessons = {
 };
 
 function getStoredLessons() {
+  const result = { [defaultLesson.id]: defaultLesson, [lessonL3.id]: lessonL3 };
   try {
-    const custom = JSON.parse(localStorage.getItem(LESSONS_KEY)) || {};
-    return { ...defaultLessons, ...custom };
-  } catch {
-    return { ...defaultLessons };
-  }
+    const raw = localStorage.getItem(LESSONS_KEY);
+    if (raw) {
+      const custom = JSON.parse(raw);
+      if (custom && typeof custom === 'object') {
+        const items = Array.isArray(custom) ? custom : Object.values(custom);
+        items.forEach(item => {
+          if (item && item.id && item.title && Array.isArray(item.words) && item.words.length > 0) {
+            result[item.id] = item;
+          }
+        });
+      }
+    }
+  } catch (e) {}
+  return result;
 }
-
 
 function saveStoredLessons(lessons) {
   try {
@@ -70,7 +79,7 @@ function saveStoredLessons(lessons) {
 function baseState() {
   return {
     command: 'waiting',
-    currentLessonId: 'l2',
+    currentLessonId: 'l3',
     wordIndex: 0,
     duration: 60,
     endsAt: null,
@@ -105,7 +114,7 @@ function write(next) {
   runTransaction(roomRef, current => {
     const prior = current || baseState();
     const shouldClearAnswers = (next.command === 'waiting' || next.command === 'stopped' || (next.command === 'playing' && Object.keys(next.answers || {}).length === 0)) && Object.keys(next.answers || {}).length === 0;
-    const mergedLessons = { ...(prior.lessons || {}), ...(next.lessons || {}), ...getStoredLessons() };
+    const mergedLessons = { ...getStoredLessons(), ...(prior.lessons || {}), ...(next.lessons || {}) };
     return {
       ...prior,
       ...next,
@@ -126,7 +135,14 @@ onValue(roomRef, snapshot => {
   const val = snapshot.val() || {};
   const serverLessons = val.lessons || {};
   const localLessons = getStoredLessons();
-  const allLessons = { ...localLessons, ...serverLessons };
+  const validServer = {};
+  const serverItems = Array.isArray(serverLessons) ? serverLessons : Object.values(serverLessons);
+  serverItems.forEach(item => {
+    if (item && item.id && item.title && Array.isArray(item.words) && item.words.length > 0) {
+      validServer[item.id] = item;
+    }
+  });
+  const allLessons = { ...localLessons, ...validServer };
   saveStoredLessons(allLessons);
   roomState = { ...baseState(), ...val, lessons: allLessons };
   notify();
@@ -143,30 +159,36 @@ function seconds(s) {
 
 function getAllLessons(state) {
   const s = state || read();
-  const local = getStoredLessons();
-  let server = s.lessons || {};
-  if (Array.isArray(server)) {
-    const obj = {};
-    server.forEach(item => { if (item && item.id) obj[item.id] = item; });
-    server = obj;
+  const validMap = getStoredLessons();
+
+  let server = s?.lessons || {};
+  if (server) {
+    const serverItems = Array.isArray(server) ? server : Object.values(server);
+    serverItems.forEach(item => {
+      if (item && item.id && item.title && Array.isArray(item.words) && item.words.length > 0) {
+        validMap[item.id] = item;
+      }
+    });
   }
-  const merged = { ...defaultLessons, ...local, ...server };
-  return Object.values(merged).filter(l => l && l.id && l.title);
+
+  const list = Object.values(validMap);
+  return list.length ? list : [defaultLesson, lessonL3];
 }
 
 function getActiveLesson(state) {
   const s = state || read();
   const all = getAllLessons(s);
-  const targetId = s.currentLessonId;
-  return all.find(l => l.id === targetId) || all.find(l => l.id === 'l3') || all.find(l => l.id === 'l2') || all[0] || defaultLesson;
+  const targetId = s?.currentLessonId;
+  return all.find(l => l.id === targetId) || all.find(l => l.id === 'l3') || all.find(l => l.id === 'l2') || all[0] || lessonL3;
 }
 
 function activeWord(state) {
   const lesson = getActiveLesson(state);
-  const words = (lesson && lesson.words && lesson.words.length) ? lesson.words : defaultLesson.words;
+  const words = (lesson && Array.isArray(lesson.words) && lesson.words.length) ? lesson.words : defaultLesson.words;
   const idx = (state && state.wordIndex >= 0 && state.wordIndex < words.length) ? state.wordIndex : 0;
   return words[idx] || words[0];
 }
+
 
 
 function parseLineForTermMeaning(line) {
