@@ -445,18 +445,31 @@ function teacherApp() {
     extractedText.value = '';
 
     try {
-      const pdfjs = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs');
-      pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs';
-      const pdf = await pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()) }).promise;
-      let text = '';
-      for (let pageNo = 1; pageNo <= pdf.numPages; pageNo++) {
-        const page = await pdf.getPage(pageNo), content = await page.getTextContent();
-        text += content.items.map(item => item.str).join(' ') + '\n';
+      if (window.pdfjsLib) {
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const pdf = await window.pdfjsLib.getDocument({ data: new Uint8Array(await file.arrayBuffer()) }).promise;
+        let text = '';
+        for (let pageNo = 1; pageNo <= pdf.numPages; pageNo++) {
+          const page = await pdf.getPage(pageNo), content = await page.getTextContent();
+          text += content.items.map(item => item.str).join(' ') + '\n';
+        }
+        extractedText.value = text;
+        updateReviewCards();
+      } else {
+        const pdfjs = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs');
+        pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs';
+        const pdf = await pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()) }).promise;
+        let text = '';
+        for (let pageNo = 1; pageNo <= pdf.numPages; pageNo++) {
+          const page = await pdf.getPage(pageNo), content = await page.getTextContent();
+          text += content.items.map(item => item.str).join(' ') + '\n';
+        }
+        extractedText.value = text;
+        updateReviewCards();
       }
-      extractedText.value = text;
-      updateReviewCards();
     } catch (error) {
-      importReviewStatus.textContent = '此 PDF 無法自動擷取文字（可能為掃描檔或網路未連線）。請在下方貼上文字後校對。';
+      console.error(error);
+      importReviewStatus.textContent = '此 PDF 無法自動擷取文字（可能為掃描檔或瀏覽器安全性限制）。請在下方貼上文字後校對。';
     }
     importReview.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
@@ -520,8 +533,6 @@ function teacherApp() {
   };
 
   function render() {
-    populateLessons();
-    populateWords();
     const s = read(), w = activeWord(s), left = Math.max(0, ((s.endsAt || 0) - Date.now()) / 1000);
     document.querySelector('#countdown').textContent = seconds(s.command === 'playing' ? left : null);
     document.querySelector('#reviewTitle').textContent = s.command === 'waiting' ? '等待派送任務' : `【${w ? w.char : '?'}】字全班作答結果與檢討`;
@@ -544,9 +555,14 @@ function teacherApp() {
     }).join('');
   }
 
-  window.addEventListener('roomchange', render);
+  window.addEventListener('roomchange', () => {
+    populateLessons();
+    populateWords();
+    render();
+  });
   setInterval(render, 500);
   render();
+
 }
 
 function studentApp() {
