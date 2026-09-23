@@ -2,7 +2,6 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getDatabase, onValue, ref, runTransaction } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 import { firebaseConfig } from './firebase-config.js';
 
-
 const ROOM_KEY = 'vocab-bright-room-v1';
 const LESSONS_KEY = 'vocab-lessons-v1';
 const firebaseApp = initializeApp(firebaseConfig);
@@ -158,6 +157,12 @@ function seconds(s) {
   return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(Math.ceil(s % 60)).padStart(2, '0')}`;
 }
 
+function isGroupOnline(presence, groupId) {
+  if (!presence) return false;
+  const ts = presence[groupId] ?? presence[String(groupId)] ?? 0;
+  return typeof ts === 'number' && (Date.now() - ts < 15000);
+}
+
 function getAllLessons(state) {
   const s = state || read();
   const validMap = getStoredLessons();
@@ -190,7 +195,135 @@ function activeWord(state) {
   return words[idx] || words[0];
 }
 
+/* Audio Synthesizer */
+function playTone(type) {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    if (!window.sharedAudioCtx) {
+      window.sharedAudioCtx = new AudioCtx();
+    }
+    const ctx = window.sharedAudioCtx;
+    if (ctx.state === 'suspended') {
+      ctx.resume();
+    }
 
+    const now = ctx.currentTime;
+    if (type === 'click') {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(523.25, now);
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+      osc.start(now);
+      osc.stop(now + 0.08);
+    } else if (type === 'correct') {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(523.25, now);
+      osc.frequency.setValueAtTime(659.25, now + 0.1);
+      osc.frequency.setValueAtTime(783.99, now + 0.2);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+      osc.start(now);
+      osc.stop(now + 0.35);
+    } else if (type === 'wrong') {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(220, now);
+      osc.frequency.setValueAtTime(174.61, now + 0.12);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+      osc.start(now);
+      osc.stop(now + 0.3);
+    } else if (type === 'unlock') {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(440, now);
+      osc.frequency.setValueAtTime(554.37, now + 0.1);
+      osc.frequency.setValueAtTime(659.25, now + 0.2);
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+      osc.start(now);
+      osc.stop(now + 0.4);
+    } else if (type === 'victory') {
+      const notes = [523.25, 659.25, 783.99, 1046.50];
+      notes.forEach((freq, idx) => {
+        const noteOsc = ctx.createOscillator();
+        const noteGain = ctx.createGain();
+        noteOsc.type = 'triangle';
+        noteOsc.frequency.setValueAtTime(freq, now + idx * 0.12);
+        noteGain.gain.setValueAtTime(0.25, now + idx * 0.12);
+        noteGain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.12 + 0.3);
+        noteOsc.connect(noteGain);
+        noteGain.connect(ctx.destination);
+        noteOsc.start(now + idx * 0.12);
+        noteOsc.stop(now + idx * 0.12 + 0.3);
+      });
+    }
+  } catch (e) {
+    console.warn('Audio play error:', e);
+  }
+}
+
+/* Confetti Animation */
+function triggerConfetti() {
+  const canvas = document.querySelector('#confettiCanvas');
+  if (!canvas) return;
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const particles = Array.from({ length: 120 }, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height * 0.3,
+    size: Math.random() * 8 + 6,
+    color: ['#ff595e', '#ffca3a', '#8ac926', '#1982c4', '#6a4c93', '#ff924c', '#52b788'][Math.floor(Math.random() * 7)],
+    vx: (Math.random() - 0.5) * 6,
+    vy: Math.random() * 4 + 3,
+    rot: Math.random() * 360,
+    vRot: (Math.random() - 0.5) * 10
+  }));
+
+  let duration = 180;
+  canvas.style.display = 'block';
+
+  function animate() {
+    if (duration <= 0) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      canvas.style.display = 'none';
+      return;
+    }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.vRot;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate((p.rot * Math.PI) / 180);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+      ctx.restore();
+    });
+    duration--;
+    requestAnimationFrame(animate);
+  }
+  animate();
+}
 
 function parseLineForTermMeaning(line) {
   const cleaned = line.replace(/^\s*(?:[0-9]+\.|\([0-9]+\)|[①-⑩]|[\u4e00-\u4e5d]、|[•\-\*])\s*/, '').trim();
@@ -330,17 +463,13 @@ function teacherApp() {
     wordSelect = document.querySelector('#wordSelect'),
     timeSelect = document.querySelector('#timeSelect');
 
-  let lastLessonKey = '';
-  let lastWordKey = '';
-
   function populateLessons() {
     const s = read();
     const lessons = getAllLessons(s);
     if (!lessons || !lessons.length) return;
 
     const html = lessons.map(l => `<option value="${l.id}">${l.title}</option>`).join('');
-    if (lessonSelect.options.length !== lessons.length || lessonSelect.innerHTML !== html) {
-      lastLessonKey = lessons.map(l => `${l.id}:${l.title}`).join('|');
+    if (lessonSelect.innerHTML !== html) {
       lessonSelect.innerHTML = html;
     }
 
@@ -359,9 +488,7 @@ function teacherApp() {
     if (!words || !words.length) return;
 
     const html = words.map((w, i) => `<option value="${i}">【${w?.char || '?'}】字生字配對 (${(w?.terms || []).length}詞)</option>`).join('');
-
-    if (wordSelect.options.length !== words.length || wordSelect.innerHTML !== html) {
-      lastWordKey = lesson.id + '::' + words.map(w => w?.char || '?').join(',');
+    if (wordSelect.innerHTML !== html) {
       wordSelect.innerHTML = html;
     }
 
@@ -408,7 +535,6 @@ function teacherApp() {
     write(s);
     populateWords();
   };
-
 
   wordSelect.onchange = () => {
     const s = read();
@@ -468,7 +594,6 @@ function teacherApp() {
     const file = pdfInput.files?.[0];
     if (!file) return;
     const name = importName.value || file.name.replace(/\.pdf$/i, '');
-    localStorage.setItem('vocab-pending-pdf-import', JSON.stringify({ fileName: file.name, lessonName: name, createdAt: Date.now() }));
     importDialog.close();
     importReview.hidden = false;
     importReviewTitle.textContent = name;
@@ -501,7 +626,7 @@ function teacherApp() {
       }
     } catch (error) {
       console.error(error);
-      importReviewStatus.textContent = '此 PDF 無法自動擷取文字（可能為掃描檔或瀏覽器安全性限制）。請在下方貼上文字後校對。';
+      importReviewStatus.textContent = 'PDF 已開啟。若未能自動文字辨識，請直接在下方文字框貼上或修改文字進行校對。';
     }
     importReview.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
@@ -537,12 +662,11 @@ function teacherApp() {
     document.querySelector('.control-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-
   document.querySelector('#startBtn').onclick = () => {
     const s = read();
     s.currentLessonId = lessonSelect.value;
     s.wordIndex = +wordSelect.value;
-    s.duration = +timeSelect.value;
+    s.duration = +(timeSelect ? timeSelect.value : 60);
     s.command = 'playing';
     s.endsAt = Date.now() + s.duration * 1000;
     s.answers = {};
@@ -570,20 +694,33 @@ function teacherApp() {
     document.querySelector('#reviewTitle').textContent = s.command === 'waiting' ? '等待派送任務' : `【${w ? w.char : '?'}】字全班作答結果與檢討`;
     document.querySelector('#reviewSub').textContent = s.command === 'playing' ? '學生正在作答，結果會即時更新。' : s.command === 'stopped' ? '本輪已結束，可檢視各組作答。' : '先選擇生字與時間，再發布任務。';
 
-    document.querySelector('#presence').innerHTML = Array.from({ length: GROUPS }, (_, i) => {
-      const id = i + 1, on = s.presence[id] && Date.now() - s.presence[id] < 16000;
-      return `<span class="presence-chip ${on ? 'online' : ''}">第 ${id} 組 ${on ? '● 已連線' : '○ 未連線'}</span>`;
-    }).join('');
+    for (let id = 1; id <= GROUPS; id++) {
+      const on = isGroupOnline(s.presence, id);
+      const chip = document.querySelector(`.presence-chip[data-group="${id}"]`);
+      if (chip) {
+        chip.className = `presence-chip ${on ? 'online' : ''}`;
+        chip.textContent = `第 ${id} 組 ${on ? '🟢 已連線' : '⚪ 未連線'}`;
+      }
+    }
 
     const results = Object.values(s.answers || {});
     const errors = {};
     results.forEach(a => a.wrong?.forEach(x => errors[x] = (errors[x] || 0) + 1));
     const top = Object.entries(errors).sort((a, b) => b[1] - a[1])[0];
-    document.querySelector('#insight').innerHTML = top ? `<span>🔥</span><div><strong>課堂核心檢討標的：【${top[0]}】</strong><p>已有 ${top[1]} 組在此詞語配對發生迷思，可立即帶全班辨析。</p></div>` : `<span>🔎</span><div><strong>課堂檢討提示</strong><p>開始後，系統會自動整理最常被混淆的語詞。</p></div>`;
+    document.querySelector('#insight').innerHTML = top ? `<span>🔥</span><div><strong>課堂核心檢討標的：【${top[0]}】</strong><p>全班共 ${top[1]} 組在此題發生迷思，可立即進行針對性精準教學。</p></div>` : `<span>🔎</span><div><strong>課堂檢討提示</strong><p>開始後，系統會自動整理最常被混淆的語詞。</p></div>`;
 
     document.querySelector('#groupGrid').innerHTML = Array.from({ length: GROUPS }, (_, i) => {
-      const id = i + 1, a = s.answers ? s.answers[id] : null, on = s.presence[id] && Date.now() - s.presence[id] < 16000;
-      return `<article class="group-card ${on ? 'online' : ''}"><h3>第 ${id} 組</h3>${a ? `<p class="group-state">${a.complete ? '✅ 已完成' : '✏️ 作答中'} · 正確 ${a.correct}/${w ? (w.terms || []).length : 0}</p><ul class="answer-list">${a.wrong?.length ? a.wrong.map(x => `<li class="wrong">✕ ${x}</li>`).join('') : '<li>目前沒有錯誤配對</li>'}</ul>` : `<p class="group-state">${on ? '已加入房間，等待作答。' : '尚未連線'}</p>`}</article>`;
+      const id = i + 1, a = s.answers ? s.answers[id] : null, on = isGroupOnline(s.presence, id);
+      const totalTerms = w ? (w.terms || []).length : 0;
+      return `<article class="group-card ${on ? 'online' : ''}">
+        <h3>第 ${id} 組 ${on ? '<small style="color:#10b981">● 在線</small>' : ''}</h3>
+        ${a ? `
+          <p class="group-state">${a.complete ? '<strong style="color:#10b981">✅ 已完成 (100% 正確)</strong>' : '✏️ 作答中'} · 正確 <strong>${a.correct || 0}</strong>/${totalTerms}</p>
+          <ul class="answer-list">
+            ${a.wrong?.length ? a.wrong.map(x => `<li class="wrong">✕ 錯選：${x}</li>`).join('') : '<li class="correct">✓ 目前無誤選項</li>'}
+          </ul>
+        ` : `<p class="group-state">${on ? '🟢 已連線報到，等待作答指令' : '⚪ 尚未連線報到'}</p>`}
+      </article>`;
     }).join('');
   }
 
@@ -594,21 +731,34 @@ function teacherApp() {
   });
   setInterval(render, 500);
   render();
-
 }
 
 function studentApp() {
   let group = +localStorage.getItem('vocab-group') || 0, selected = null, termOrder = [];
+  let lastCommand = 'waiting';
+  let celebratedWord = '';
+
   const dialog = document.querySelector('#groupDialog');
+  const changeBtn = document.querySelector('#changeGroupBtn');
+
   document.querySelector('#groupChoices').innerHTML = Array.from({ length: GROUPS }, (_, i) => `<button class="group-choice" value="${i + 1}">第 ${i + 1} 組</button>`).join('');
   document.querySelectorAll('.group-choice').forEach(b => b.onclick = () => {
     group = +b.value;
     localStorage.setItem('vocab-group', group);
-    dialog.close();
+    if (dialog.open) dialog.close();
     presence();
     render();
   });
-  if (!group) dialog.showModal();
+
+  if (changeBtn) {
+    changeBtn.onclick = () => {
+      if (typeof dialog.showModal === 'function') dialog.showModal();
+    };
+  }
+
+  if (!group && typeof dialog.showModal === 'function') {
+    dialog.showModal();
+  }
 
   function presence() {
     if (!group) return;
@@ -617,7 +767,7 @@ function studentApp() {
     s.presence[group] = Date.now();
     write(s);
   }
-  setInterval(presence, 5000);
+  setInterval(presence, 4000);
   presence();
 
   function render() {
@@ -625,13 +775,23 @@ function studentApp() {
     const activeLesson = getActiveLesson(s);
     const words = activeLesson.words || [];
 
-    document.querySelector('#studentStatus').textContent = group ? `● 第 ${group} 組已連線` : '● 等待加入小組';
+    if (lastCommand !== 'playing' && s.command === 'playing') {
+      playTone('unlock');
+      celebratedWord = '';
+    }
+    lastCommand = s.command;
+
+    const statusEl = document.querySelector('#studentStatus');
+    if (statusEl) {
+      statusEl.textContent = group ? `第 ${group} 組已連線` : '等待加入小組';
+    }
+
     document.querySelector('#wordChips').innerHTML = words.map((x, i) => `<span class="word-chip ${i === s.wordIndex ? 'active' : ''}">${x.char}</span>`).join('');
     document.querySelector('#charBadge').textContent = w ? w.char : '?';
     document.querySelector('#studentTimer').textContent = seconds(playing ? (s.endsAt - Date.now()) / 1000 : null);
     document.querySelector('#taskPanel').classList.toggle('locked', !playing);
-    document.querySelector('#taskTitle').textContent = playing ? `【第 ${group} 組】生字【${w ? w.char : '?'}】配對任務` : (s.command === 'stopped' ? '本輪作答已結束' : '已進入房間，等待老師開始');
-    document.querySelector('#taskHint').textContent = playing ? '請將左側語詞與右側詞義配對。' : '請留意教師大螢幕，老師發布後會自動開始。';
+    document.querySelector('#taskTitle').textContent = playing ? `【第 ${group} 組】生字【${w ? w.char : '?'}】配對任務` : (s.command === 'stopped' ? '本輪作答已結束（鎖定中）' : '已連線報到，等待老師開始作答');
+    document.querySelector('#taskHint').textContent = playing ? '請將左側「語詞」與右側「詞義解釋」點擊進行配對。' : '請先選擇組別，並留意教師大螢幕指令。';
 
     if (w && (!termOrder.length || termOrder[0]?.word !== w.char)) {
       termOrder = shuffle((w.terms || []).map(([term, meaning]) => ({ word: w.char, term, meaning })));
@@ -642,10 +802,30 @@ function studentApp() {
 
   function drawCards(s, w, playing) {
     if (!w || !w.terms) return;
-    const prior = (s.answers && s.answers[group]) || { matches: {}, wrong: [] };
+    const prior = (s.answers && s.answers[group]) || { matches: {}, wrong: [], complete: false };
     const left = w.terms.map(([term, meaning]) => ({ term, meaning })), right = termOrder;
-    document.querySelector('#matchingGrid').innerHTML = `<div>${left.map(x => card(x.term, 'term', prior.matches ? prior.matches[x.term] : null)).join('')}</div><div>${right.map(x => card(x.meaning, 'meaning', null)).join('')}</div>`;
-    document.querySelectorAll('.match-card').forEach(b => b.onclick = () => choose(b.dataset.value, b.dataset.type));
+
+    if (prior.complete && celebratedWord !== w.char) {
+      celebratedWord = w.char;
+      triggerConfetti();
+      playTone('victory');
+    }
+
+    document.querySelector('#matchingGrid').innerHTML = `
+      <div>${left.map(x => card(x.term, 'term', prior.matches ? prior.matches[x.term] : null)).join('')}</div>
+      <div>${right.map(x => card(x.meaning, 'meaning', null)).join('')}</div>
+    `;
+
+    if (prior.complete) {
+      document.querySelector('#feedback').innerHTML = '<div class="celebration-banner">🎉 恭喜！100% 全部配對正確！挑戰成功！</div>';
+    }
+
+    document.querySelectorAll('.match-card').forEach(b => {
+      b.onclick = () => {
+        playTone('click');
+        choose(b.dataset.value, b.dataset.type);
+      };
+    });
 
     function card(value, type, matched) {
       const isMatched = matched === 'ok';
@@ -656,6 +836,11 @@ function studentApp() {
   function choose(value, type) {
     const s = read(), w = activeWord(s);
     if (!w || s.command !== 'playing') return;
+    if (!group) {
+      dialog.showModal();
+      return;
+    }
+
     if (!selected) {
       selected = { value, type };
       render();
@@ -666,19 +851,23 @@ function studentApp() {
       render();
       return;
     }
-    const term = selected.type === 'term' ? selected.value : value, meaning = selected.type === 'meaning' ? selected.value : value;
+    const term = selected.type === 'term' ? selected.value : value;
+    const meaning = selected.type === 'meaning' ? selected.value : value;
     const correct = w.terms.find(x => x[0] === term)?.[1] === meaning;
+
     const a = (s.answers && s.answers[group]) || { matches: {}, wrong: [], complete: false, correct: 0 };
     a.matches = a.matches || {};
     a.wrong = a.wrong || [];
 
     if (correct) {
+      playTone('correct');
       a.matches[term] = 'ok';
       a.correct = Object.keys(a.matches).length;
-      document.querySelector('#feedback').textContent = '配對正確！';
+      document.querySelector('#feedback').textContent = '✅ 配對正確！太棒了！';
     } else {
+      playTone('wrong');
       if (!a.wrong.includes(term)) a.wrong.push(term);
-      document.querySelector('#feedback').textContent = '再想一想，試著選另一張詞義卡。';
+      document.querySelector('#feedback').textContent = '✕ 再想一想，試著選擇正確的詞義卡！';
     }
     a.complete = a.correct === w.terms.length;
     s.answers = s.answers || {};
@@ -692,6 +881,3 @@ function studentApp() {
   setInterval(render, 500);
   render();
 }
-s[group]||{matches:{},wrong:[]};const left=w.terms.map(([term,meaning])=>({term,meaning})),right=termOrder;document.querySelector('#matchingGrid').innerHTML=`<div>${left.map(x=>card(x.term,'term',prior.matches[x.term])).join('')}</div><div>${right.map(x=>card(x.meaning,'meaning',null)).join('')}</div>`;document.querySelectorAll('.match-card').forEach(b=>b.onclick=()=>choose(b.dataset.value,b.dataset.type));function card(value,type,matched){const isMatched=matched==='ok';return `<button class="match-card ${selected?.type===type&&selected.value===value?'selected':''} ${isMatched?'matched':''}" data-type="${type}" data-value="${value.replaceAll('&','&amp;').replaceAll('"','&quot;')}">${value}${isMatched?'　✓':''}</button>`}}
- function choose(value,type){const s=read(),w=activeWord(s);if(s.command!=='playing')return;if(!selected){selected={value,type};render();return}if(selected.type===type){selected={value,type};render();return}const term=selected.type==='term'?selected.value:value,meaning=selected.type==='meaning'?selected.value:value;const correct=w.terms.find(x=>x[0]===term)?.[1]===meaning;const a=s.answers[group]||{matches:{},wrong:[],complete:false,correct:0};if(correct){a.matches[term]='ok';a.correct=Object.keys(a.matches).length;document.querySelector('#feedback').textContent='配對正確！';}else{if(!a.wrong.includes(term))a.wrong.push(term);document.querySelector('#feedback').textContent='再想一想，試著選另一張詞義卡。'}a.complete=a.correct===w.terms.length;s.answers[group]=a;write(s);selected=null;render()}
- window.addEventListener('roomchange',render);setInterval(render,500);render()}
