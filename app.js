@@ -1,6 +1,7 @@
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js';
-import { getDatabase, onValue, ref, runTransaction } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, onValue, ref, runTransaction } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 import { firebaseConfig } from './firebase-config.js';
+
 
 const ROOM_KEY = 'vocab-bright-room-v1';
 const LESSONS_KEY = 'vocab-lessons-v1';
