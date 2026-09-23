@@ -220,31 +220,6 @@ function playTone(type) {
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
       osc.start(now);
       osc.stop(now + 0.08);
-    } else if (type === 'correct') {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(523.25, now);
-      osc.frequency.setValueAtTime(659.25, now + 0.1);
-      osc.frequency.setValueAtTime(783.99, now + 0.2);
-      gain.gain.setValueAtTime(0.2, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
-      osc.start(now);
-      osc.stop(now + 0.35);
-    } else if (type === 'wrong') {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(220, now);
-      osc.frequency.setValueAtTime(174.61, now + 0.12);
-      gain.gain.setValueAtTime(0.2, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-      osc.start(now);
-      osc.stop(now + 0.3);
     } else if (type === 'unlock') {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -539,6 +514,7 @@ function teacherApp() {
   wordSelect.onchange = () => {
     const s = read();
     s.wordIndex = +wordSelect.value;
+    s.answers = {};
     write(s);
   };
 
@@ -691,8 +667,8 @@ function teacherApp() {
   function render() {
     const s = read(), w = activeWord(s), left = Math.max(0, ((s.endsAt || 0) - Date.now()) / 1000);
     document.querySelector('#countdown').textContent = seconds(s.command === 'playing' ? left : null);
-    document.querySelector('#reviewTitle').textContent = s.command === 'waiting' ? '等待派送任務' : `【${w ? w.char : '?'}】字全班作答結果與檢討`;
-    document.querySelector('#reviewSub').textContent = s.command === 'playing' ? '學生正在作答，結果會即時更新。' : s.command === 'stopped' ? '本輪已結束，可檢視各組作答。' : '先選擇生字與時間，再發布任務。';
+    document.querySelector('#reviewTitle').textContent = s.command === 'waiting' ? '等待派送任務' : `【${w ? w.char : '?'}】字 全班 7 組作答結果對比與檢討`;
+    document.querySelector('#reviewSub').textContent = s.command === 'playing' ? '大螢幕同步對比各組即時選答！學生在手邊平板作答時不會顯示即時對錯。' : s.command === 'stopped' ? '⏰ 作答結束！大螢幕呈現全班各組配對詳情與檢討標的。' : '先選擇生字與時間，再發布任務。';
 
     for (let id = 1; id <= GROUPS; id++) {
       const on = isGroupOnline(s.presence, id);
@@ -707,19 +683,54 @@ function teacherApp() {
     const errors = {};
     results.forEach(a => a.wrong?.forEach(x => errors[x] = (errors[x] || 0) + 1));
     const top = Object.entries(errors).sort((a, b) => b[1] - a[1])[0];
-    document.querySelector('#insight').innerHTML = top ? `<span>🔥</span><div><strong>課堂核心檢討標的：【${top[0]}】</strong><p>全班共 ${top[1]} 組在此題發生迷思，可立即進行針對性精準教學。</p></div>` : `<span>🔎</span><div><strong>課堂檢討提示</strong><p>開始後，系統會自動整理最常被混淆的語詞。</p></div>`;
+
+    document.querySelector('#insight').innerHTML = top ? `
+      <div class="insight-alert">
+        <span style="font-size:28px">🔥</span>
+        <div>
+          <strong>課堂核心檢討標的：【${top[0]}】（全班共 ${top[1]} 組在此題發生迷思）</strong>
+          <p>請老師引導全班針對【${top[0]}】的詞義概念進行辨析與說明！</p>
+        </div>
+      </div>
+    ` : `
+      <div class="insight-hint">
+        <span style="font-size:26px">🔎</span>
+        <div>
+          <strong>課堂檢討提示</strong>
+          <p>開始作答後，系統會自動整理全班最常被混淆的語詞。</p>
+        </div>
+      </div>
+    `;
 
     document.querySelector('#groupGrid').innerHTML = Array.from({ length: GROUPS }, (_, i) => {
       const id = i + 1, a = s.answers ? s.answers[id] : null, on = isGroupOnline(s.presence, id);
       const totalTerms = w ? (w.terms || []).length : 0;
+      const pairs = a?.pairs || {};
+
+      let answerItemsHtml = '';
+      if (w && w.terms) {
+        answerItemsHtml = w.terms.map(([term, correctMeaning]) => {
+          const userChoice = pairs[term];
+          if (!userChoice) {
+            return `<li class="unanswered">⚪ <strong>${term}</strong><div class="sub-text">尚未配對</div></li>`;
+          } else if (userChoice === correctMeaning) {
+            return `<li class="correct">✓ <strong>${term}</strong><div class="sub-text">對應：${correctMeaning}</div></li>`;
+          } else {
+            return `<li class="wrong">✕ <strong>${term}</strong><div class="sub-text">錯選：${userChoice}</div></li>`;
+          }
+        }).join('');
+      }
+
       return `<article class="group-card ${on ? 'online' : ''}">
-        <h3>第 ${id} 組 ${on ? '<small style="color:#10b981">● 在線</small>' : ''}</h3>
+        <div class="group-card-header">
+          <h3>第 ${id} 組 ${on ? '<small style="color:#10b981;font-size:12px">● 在線</small>' : ''}</h3>
+          ${a ? `<span class="score-tag ${a.correct === totalTerms ? '' : (a.correct > 0 ? '' : 'quiet')}">答對 ${a.correct || 0}/${totalTerms} 題</span>` : '<span class="score-tag quiet">未連線</span>'}
+        </div>
         ${a ? `
-          <p class="group-state">${a.complete ? '<strong style="color:#10b981">✅ 已完成 (100% 正確)</strong>' : '✏️ 作答中'} · 正確 <strong>${a.correct || 0}</strong>/${totalTerms}</p>
           <ul class="answer-list">
-            ${a.wrong?.length ? a.wrong.map(x => `<li class="wrong">✕ 錯選：${x}</li>`).join('') : '<li class="correct">✓ 目前無誤選項</li>'}
+            ${answerItemsHtml}
           </ul>
-        ` : `<p class="group-state">${on ? '🟢 已連線報到，等待作答指令' : '⚪ 尚未連線報到'}</p>`}
+        ` : `<p class="muted">${on ? '🟢 等待小組在平板上開始自由連線配對…' : '⚪ 尚未連線報到'}</p>`}
       </article>`;
     }).join('');
   }
@@ -790,8 +801,8 @@ function studentApp() {
     document.querySelector('#charBadge').textContent = w ? w.char : '?';
     document.querySelector('#studentTimer').textContent = seconds(playing ? (s.endsAt - Date.now()) / 1000 : null);
     document.querySelector('#taskPanel').classList.toggle('locked', !playing);
-    document.querySelector('#taskTitle').textContent = playing ? `【第 ${group} 組】生字【${w ? w.char : '?'}】配對任務` : (s.command === 'stopped' ? '本輪作答已結束（鎖定中）' : '已連線報到，等待老師開始作答');
-    document.querySelector('#taskHint').textContent = playing ? '請將左側「語詞」與右側「詞義解釋」點擊進行配對。' : '請先選擇組別，並留意教師大螢幕指令。';
+    document.querySelector('#taskTitle').textContent = playing ? `【第 ${group} 組】生字【${w ? w.char : '?'}】配對任務` : (s.command === 'stopped' ? '本輪作答已結束（鎖定中）' : '已連線報到，等待老師發布任務');
+    document.querySelector('#taskHint').textContent = playing ? '老師發布開始後即可作答！連線結果同步至大螢幕。' : '請先選擇組別，並留意教師大螢幕指令。';
 
     if (w && (!termOrder.length || termOrder[0]?.word !== w.char)) {
       termOrder = shuffle((w.terms || []).map(([term, meaning]) => ({ word: w.char, term, meaning })));
@@ -802,22 +813,52 @@ function studentApp() {
 
   function drawCards(s, w, playing) {
     if (!w || !w.terms) return;
-    const prior = (s.answers && s.answers[group]) || { matches: {}, wrong: [], complete: false };
-    const left = w.terms.map(([term, meaning]) => ({ term, meaning })), right = termOrder;
+    const prior = (s.answers && s.answers[group]) || { pairs: {}, complete: false, correct: 0 };
+    const leftTerms = (w.terms || []).map(t => t[0]);
+    const right = termOrder;
 
-    if (prior.complete && celebratedWord !== w.char) {
+    const pairedCount = Object.keys(prior.pairs || {}).length;
+    const totalCount = leftTerms.length;
+
+    if (prior.complete && (s.command === 'stopped' || Date.now() >= (s.endsAt || 0)) && celebratedWord !== w.char && prior.correct === totalCount) {
       celebratedWord = w.char;
       triggerConfetti();
       playTone('victory');
     }
 
-    document.querySelector('#matchingGrid').innerHTML = `
-      <div>${left.map(x => card(x.term, 'term', prior.matches ? prior.matches[x.term] : null)).join('')}</div>
-      <div>${right.map(x => card(x.meaning, 'meaning', null)).join('')}</div>
-    `;
+    // Render left column (Terms)
+    const leftHtml = leftTerms.map((term, idx) => {
+      const isPaired = !!(prior.pairs && prior.pairs[term]);
+      const isSelected = selected?.type === 'term' && selected.value === term;
+      return `<button class="match-card ${isSelected ? 'selected' : ''} ${isPaired ? 'paired' : ''}" data-type="term" data-value="${term}">
+        <span>${term}</span>
+        ${isPaired ? '<span class="check-badge">✓</span>' : ''}
+      </button>`;
+    }).join('');
 
-    if (prior.complete) {
-      document.querySelector('#feedback').innerHTML = '<div class="celebration-banner">🎉 恭喜！100% 全部配對正確！挑戰成功！</div>';
+    // Render right column (Meanings)
+    const rightHtml = right.map(x => {
+      const meaning = x.meaning;
+      const pairedTerm = Object.keys(prior.pairs || {}).find(t => prior.pairs[t] === meaning);
+      const pairedTermIndex = pairedTerm ? leftTerms.indexOf(pairedTerm) + 1 : 0;
+      const isSelected = selected?.type === 'meaning' && selected.value === meaning;
+
+      return `<button class="match-card ${isSelected ? 'selected' : ''} ${pairedTermIndex > 0 ? 'paired' : ''}" data-type="meaning" data-value="${meaning.replaceAll('&', '&amp;').replaceAll('"', '&quot;')}">
+        <span class="meaning-text">${meaning}</span>
+        ${pairedTermIndex > 0 ? `<span class="badge-num">${pairedTermIndex}</span>` : ''}
+      </button>`;
+    }).join('');
+
+    document.querySelector('#matchingGrid').innerHTML = `<div>${leftHtml}</div><div>${rightHtml}</div>`;
+
+    // Feedback badge prompt
+    const feedbackEl = document.querySelector('#feedback');
+    if (pairedCount === totalCount && totalCount > 0) {
+      feedbackEl.innerHTML = `<div class="status-badge success">已完成全數配對 (${pairedCount}/${totalCount})！可點擊卡片隨時調整配對，請靜候老師大螢幕檢討。</div>`;
+    } else if (pairedCount > 0) {
+      feedbackEl.innerHTML = `<div class="status-badge warning">已配對 ${pairedCount}/${totalCount} 題，請再討論調整！</div>`;
+    } else {
+      feedbackEl.innerHTML = `<div class="status-badge info">💡 點擊左側「語詞」與右側「詞義解釋」卡片進行自由配對</div>`;
     }
 
     document.querySelectorAll('.match-card').forEach(b => {
@@ -826,11 +867,6 @@ function studentApp() {
         choose(b.dataset.value, b.dataset.type);
       };
     });
-
-    function card(value, type, matched) {
-      const isMatched = matched === 'ok';
-      return `<button class="match-card ${selected?.type === type && selected.value === value ? 'selected' : ''} ${isMatched ? 'matched' : ''}" data-type="${type}" data-value="${value.replaceAll('&', '&amp;').replaceAll('"', '&quot;')}">${value}${isMatched ? '　✓' : ''}</button>`;
-    }
   }
 
   function choose(value, type) {
@@ -851,25 +887,30 @@ function studentApp() {
       render();
       return;
     }
+
     const term = selected.type === 'term' ? selected.value : value;
     const meaning = selected.type === 'meaning' ? selected.value : value;
-    const correct = w.terms.find(x => x[0] === term)?.[1] === meaning;
 
-    const a = (s.answers && s.answers[group]) || { matches: {}, wrong: [], complete: false, correct: 0 };
-    a.matches = a.matches || {};
-    a.wrong = a.wrong || [];
+    const a = (s.answers && s.answers[group]) || { pairs: {}, correct: 0, wrong: [], complete: false };
+    a.pairs = a.pairs || {};
+    a.pairs[term] = meaning;
 
-    if (correct) {
-      playTone('correct');
-      a.matches[term] = 'ok';
-      a.correct = Object.keys(a.matches).length;
-      document.querySelector('#feedback').textContent = '✅ 配對正確！太棒了！';
-    } else {
-      playTone('wrong');
-      if (!a.wrong.includes(term)) a.wrong.push(term);
-      document.querySelector('#feedback').textContent = '✕ 再想一想，試著選擇正確的詞義卡！';
-    }
-    a.complete = a.correct === w.terms.length;
+    // Evaluate answers silently for teacher's real-time dashboard analytics
+    let correctCount = 0;
+    const wrongTerms = [];
+    w.terms.forEach(([t, m]) => {
+      const userChoice = a.pairs[t];
+      if (userChoice === m) {
+        correctCount++;
+      } else if (userChoice && userChoice !== m) {
+        wrongTerms.push(t);
+      }
+    });
+
+    a.correct = correctCount;
+    a.wrong = wrongTerms;
+    a.complete = Object.keys(a.pairs).length === w.terms.length;
+
     s.answers = s.answers || {};
     s.answers[group] = a;
     write(s);
