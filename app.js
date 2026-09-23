@@ -325,25 +325,6 @@ if (document.body.dataset.page === 'teacher') teacherApp();
 else if (document.body.dataset.page === 'student') studentApp();
 
 function teacherApp() {
-  const teacherLogin = document.querySelector('#teacherLogin'),
-    teacherLoginForm = document.querySelector('#teacherLoginForm'),
-    teacherPassword = document.querySelector('#teacherPassword'),
-    loginError = document.querySelector('#loginError');
-
-  if (sessionStorage.getItem('vocab-teacher-authorized') !== 'yes') {
-    teacherLogin.showModal();
-    teacherLoginForm.onsubmit = e => {
-      e.preventDefault();
-      if (teacherPassword.value === '0603') {
-        sessionStorage.setItem('vocab-teacher-authorized', 'yes');
-        teacherLogin.close();
-      } else {
-        loginError.textContent = '密碼不正確，請再試一次。';
-        teacherPassword.select();
-      }
-    };
-  }
-
   const lessonSelect = document.querySelector('#lessonSelect'),
     wordSelect = document.querySelector('#wordSelect'),
     timeSelect = document.querySelector('#timeSelect');
@@ -354,42 +335,69 @@ function teacherApp() {
   function populateLessons() {
     const s = read();
     const lessons = getAllLessons(s);
-    if (!lessons.length) return;
+    if (!lessons || !lessons.length) return;
 
-    const currentKey = lessons.map(l => `${l.id}:${l.title}`).join('|');
-    if (currentKey !== lastLessonKey || lessonSelect.options.length === 0) {
-      lastLessonKey = currentKey;
-      lessonSelect.innerHTML = lessons.map(l => `<option value="${l.id}">${l.title}</option>`).join('');
+    const html = lessons.map(l => `<option value="${l.id}">${l.title}</option>`).join('');
+    if (lessonSelect.options.length !== lessons.length || lessonSelect.innerHTML !== html) {
+      lastLessonKey = lessons.map(l => `${l.id}:${l.title}`).join('|');
+      lessonSelect.innerHTML = html;
     }
 
     const activeLesson = getActiveLesson(s);
-    if (lessonSelect.value !== activeLesson.id && lessons.some(l => l.id === activeLesson.id)) {
+    if (lessons.some(l => l.id === activeLesson.id)) {
       lessonSelect.value = activeLesson.id;
+    } else if (lessons.length > 0) {
+      lessonSelect.value = lessons[0].id;
     }
   }
 
   function populateWords() {
     const s = read();
     const lesson = getActiveLesson(s);
-    const words = (lesson && lesson.words && lesson.words.length) ? lesson.words : [];
-    if (!words.length) return;
+    const words = (lesson && Array.isArray(lesson.words) && lesson.words.length) ? lesson.words : defaultLesson.words;
+    if (!words || !words.length) return;
 
-    const currentKey = lesson.id + '::' + words.map(w => w.char).join(',');
-    if (currentKey !== lastWordKey || wordSelect.options.length === 0) {
-      lastWordKey = currentKey;
-      wordSelect.innerHTML = words.map((w, i) => `<option value="${i}">【${w.char}】字生字配對 (${(w.terms || []).length}詞)</option>`).join('');
+    const html = words.map((w, i) => `<option value="${i}">【${w?.char || '?'}】字生字配對 (${(w?.terms || []).length}詞)</option>`).join('');
+
+    if (wordSelect.options.length !== words.length || wordSelect.innerHTML !== html) {
+      lastWordKey = lesson.id + '::' + words.map(w => w?.char || '?').join(',');
+      wordSelect.innerHTML = html;
     }
 
     const targetIndex = (s.wordIndex >= 0 && s.wordIndex < words.length) ? s.wordIndex : 0;
-    if (wordSelect.value != targetIndex) {
-      wordSelect.value = targetIndex;
-    }
-    timeSelect.value = s.duration || 60;
+    wordSelect.value = targetIndex;
+    if (timeSelect) timeSelect.value = s.duration || 60;
   }
-
 
   populateLessons();
   populateWords();
+
+  try {
+    const teacherLogin = document.querySelector('#teacherLogin'),
+      teacherLoginForm = document.querySelector('#teacherLoginForm'),
+      teacherPassword = document.querySelector('#teacherPassword'),
+      loginError = document.querySelector('#loginError');
+
+    if (teacherLogin && sessionStorage.getItem('vocab-teacher-authorized') !== 'yes') {
+      if (typeof teacherLogin.showModal === 'function' && !teacherLogin.open) {
+        teacherLogin.showModal();
+      }
+      if (teacherLoginForm) {
+        teacherLoginForm.onsubmit = e => {
+          e.preventDefault();
+          if (teacherPassword && teacherPassword.value === '0603') {
+            sessionStorage.setItem('vocab-teacher-authorized', 'yes');
+            if (teacherLogin && teacherLogin.open) teacherLogin.close();
+          } else if (loginError) {
+            loginError.textContent = '密碼不正確，請再試一次。';
+            if (teacherPassword) teacherPassword.select();
+          }
+        };
+      }
+    }
+  } catch (err) {
+    console.warn('Login modal warning:', err);
+  }
 
   lessonSelect.onchange = () => {
     const s = read();
@@ -399,6 +407,7 @@ function teacherApp() {
     write(s);
     populateWords();
   };
+
 
   wordSelect.onchange = () => {
     const s = read();
