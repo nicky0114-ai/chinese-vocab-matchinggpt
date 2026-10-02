@@ -79,7 +79,7 @@ const defaultLessons = {
 };
 
 function getStoredLessons() {
-  const result = { [defaultLesson.id]: defaultLesson, [lessonL3.id]: lessonL3, [lessonL4.id]: lessonL4 };
+  const result = {};
   try {
     const raw = localStorage.getItem(LESSONS_KEY);
     if (raw) {
@@ -94,6 +94,9 @@ function getStoredLessons() {
       }
     }
   } catch (e) {}
+  result[defaultLesson.id] = defaultLesson;
+  result[lessonL3.id] = lessonL3;
+  result[lessonL4.id] = lessonL4;
   return result;
 }
 
@@ -142,7 +145,7 @@ function write(next) {
   runTransaction(roomRef, current => {
     const prior = current || baseState();
     const shouldClearAnswers = (next.command === 'waiting' || next.command === 'stopped' || (next.command === 'playing' && Object.keys(next.answers || {}).length === 0)) && Object.keys(next.answers || {}).length === 0;
-    const mergedLessons = { ...getStoredLessons(), ...(prior.lessons || {}), ...(next.lessons || {}) };
+    const mergedLessons = { ...getStoredLessons(), ...(prior.lessons || {}), ...(next.lessons || {}), [defaultLesson.id]: defaultLesson, [lessonL3.id]: lessonL3, [lessonL4.id]: lessonL4 };
     return {
       ...prior,
       ...next,
@@ -170,7 +173,7 @@ onValue(roomRef, snapshot => {
       validServer[item.id] = item;
     }
   });
-  const allLessons = { ...localLessons, ...validServer };
+  const allLessons = { ...localLessons, ...validServer, [defaultLesson.id]: defaultLesson, [lessonL3.id]: lessonL3, [lessonL4.id]: lessonL4 };
   saveStoredLessons(allLessons);
   roomState = { ...baseState(), ...val, lessons: allLessons };
   notify();
@@ -204,6 +207,9 @@ function getAllLessons(state) {
       }
     });
   }
+  validMap[defaultLesson.id] = defaultLesson;
+  validMap[lessonL3.id] = lessonL3;
+  validMap[lessonL4.id] = lessonL4;
 
   const list = Object.values(validMap);
   return list.length ? list : [defaultLesson, lessonL3, lessonL4];
@@ -472,13 +478,20 @@ function teacherApp() {
     const lessons = getAllLessons(s);
     if (!lessons || !lessons.length) return;
 
-    const html = lessons.map(l => `<option value="${l.id}">${l.title}</option>`).join('');
+    const html = lessons.map(l => `<option value="${l.id}">${l.title} (${l.words ? l.words.length : 0}字)</option>`).join('');
     if (lessonSelect.innerHTML !== html) {
       lessonSelect.innerHTML = html;
     }
 
-    const activeLesson = getActiveLesson(s);
-    if (lessons.some(l => l.id === activeLesson.id)) {
+    let activeLesson = getActiveLesson(s);
+    if (activeLesson && activeLesson.id.startsWith('lesson_') && activeLesson.words.length <= 4 && lessons.some(l => l.id === 'l4')) {
+      s.currentLessonId = 'l4';
+      s.wordIndex = 0;
+      write(s);
+      activeLesson = lessons.find(l => l.id === 'l4');
+    }
+
+    if (activeLesson && lessons.some(l => l.id === activeLesson.id)) {
       lessonSelect.value = activeLesson.id;
     } else if (lessons.length > 0) {
       lessonSelect.value = lessons[0].id;
