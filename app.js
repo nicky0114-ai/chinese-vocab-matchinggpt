@@ -7,7 +7,7 @@ const LESSONS_KEY = 'vocab-lessons-v1';
 const firebaseApp = initializeApp(firebaseConfig);
 const database = getDatabase(firebaseApp);
 const roomRef = ref(database, 'vocab_rooms/room603/state');
-const GROUPS = 7;
+const DEFAULT_GROUPS = 7;
 
 const defaultLesson = {
   id: 'l2',
@@ -79,6 +79,7 @@ function saveStoredLessons(lessons) {
 function baseState() {
   return {
     command: 'waiting',
+    groupCount: DEFAULT_GROUPS,
     currentLessonId: 'l3',
     wordIndex: 0,
     duration: 60,
@@ -436,7 +437,8 @@ else if (document.body.dataset.page === 'student') studentApp();
 function teacherApp() {
   const lessonSelect = document.querySelector('#lessonSelect'),
     wordSelect = document.querySelector('#wordSelect'),
-    timeSelect = document.querySelector('#timeSelect');
+    timeSelect = document.querySelector('#timeSelect'),
+    groupCountSelect = document.querySelector('#groupCountSelect');
 
   function populateLessons() {
     const s = read();
@@ -470,6 +472,7 @@ function teacherApp() {
     const targetIndex = (s.wordIndex >= 0 && s.wordIndex < words.length) ? s.wordIndex : 0;
     wordSelect.value = targetIndex;
     if (timeSelect) timeSelect.value = s.duration || 60;
+    if (groupCountSelect) groupCountSelect.value = s.groupCount || 7;
   }
 
   populateLessons();
@@ -517,6 +520,14 @@ function teacherApp() {
     s.answers = {};
     write(s);
   };
+
+  if (groupCountSelect) {
+    groupCountSelect.onchange = () => {
+      const s = read();
+      s.groupCount = +groupCountSelect.value;
+      write(s);
+    };
+  }
 
   const importDialog = document.querySelector('#importDialog'),
     pdfInput = document.querySelector('#pdfInput'),
@@ -643,6 +654,7 @@ function teacherApp() {
     s.currentLessonId = lessonSelect.value;
     s.wordIndex = +wordSelect.value;
     s.duration = +(timeSelect ? timeSelect.value : 60);
+    s.groupCount = +(groupCountSelect ? groupCountSelect.value : 7);
     s.command = 'playing';
     s.endsAt = Date.now() + s.duration * 1000;
     s.answers = {};
@@ -666,18 +678,21 @@ function teacherApp() {
 
   function render() {
     const s = read(), w = activeWord(s), left = Math.max(0, ((s.endsAt || 0) - Date.now()) / 1000);
+    const totalGroups = s.groupCount || 7;
+
+    if (groupCountSelect && +groupCountSelect.value !== totalGroups) {
+      groupCountSelect.value = totalGroups;
+    }
+
     document.querySelector('#countdown').textContent = seconds(s.command === 'playing' ? left : null);
-    document.querySelector('#reviewTitle').textContent = s.command === 'waiting' ? '等待派送任務' : `【${w ? w.char : '?'}】字 全班 7 組作答結果對比與檢討`;
+    document.querySelector('#reviewTitle').textContent = s.command === 'waiting' ? '等待派送任務' : `【${w ? w.char : '?'}】字 全班 ${totalGroups} 組作答結果對比與檢討`;
     document.querySelector('#reviewSub').textContent = s.command === 'playing' ? '大螢幕同步對比各組即時選答！學生在手邊平板作答時不會顯示即時對錯。' : s.command === 'stopped' ? '⏰ 作答結束！大螢幕呈現全班各組配對詳情與檢討標的。' : '先選擇生字與時間，再發布任務。';
 
-    for (let id = 1; id <= GROUPS; id++) {
+    document.querySelector('#presence').innerHTML = Array.from({ length: totalGroups }, (_, i) => {
+      const id = i + 1;
       const on = isGroupOnline(s.presence, id);
-      const chip = document.querySelector(`.presence-chip[data-group="${id}"]`);
-      if (chip) {
-        chip.className = `presence-chip ${on ? 'online' : ''}`;
-        chip.textContent = `第 ${id} 組 ${on ? '🟢 已連線' : '⚪ 未連線'}`;
-      }
-    }
+      return `<span class="presence-chip ${on ? 'online' : ''}" data-group="${id}">第 ${id} 組 ${on ? '🟢 已連線' : '⚪ 未連線'}</span>`;
+    }).join('');
 
     const results = Object.values(s.answers || {});
     const errors = {};
@@ -702,7 +717,7 @@ function teacherApp() {
       </div>
     `;
 
-    document.querySelector('#groupGrid').innerHTML = Array.from({ length: GROUPS }, (_, i) => {
+    document.querySelector('#groupGrid').innerHTML = Array.from({ length: totalGroups }, (_, i) => {
       const id = i + 1, a = s.answers ? s.answers[id] : null, on = isGroupOnline(s.presence, id);
       const totalTerms = w ? (w.terms || []).length : 0;
       const pairs = a?.pairs || {};
@@ -752,17 +767,33 @@ function studentApp() {
   const dialog = document.querySelector('#groupDialog');
   const changeBtn = document.querySelector('#changeGroupBtn');
 
-  document.querySelector('#groupChoices').innerHTML = Array.from({ length: GROUPS }, (_, i) => `<button class="group-choice" value="${i + 1}">第 ${i + 1} 組</button>`).join('');
-  document.querySelectorAll('.group-choice').forEach(b => b.onclick = () => {
-    group = +b.value;
-    localStorage.setItem('vocab-group', group);
-    if (dialog.open) dialog.close();
-    presence();
-    render();
-  });
+  function renderGroupChoices() {
+    const s = read();
+    const totalGroups = s.groupCount || 7;
+    const choicesEl = document.querySelector('#groupChoices');
+    if (!choicesEl) return;
+    const html = Array.from({ length: totalGroups }, (_, i) =>
+      `<button class="group-choice ${group === i + 1 ? 'selected' : ''}" value="${i + 1}">第 ${i + 1} 組</button>`
+    ).join('');
+    if (choicesEl.innerHTML !== html) {
+      choicesEl.innerHTML = html;
+      choicesEl.querySelectorAll('.group-choice').forEach(b => {
+        b.onclick = () => {
+          group = +b.value;
+          localStorage.setItem('vocab-group', group);
+          if (dialog.open) dialog.close();
+          presence();
+          render();
+        };
+      });
+    }
+  }
+
+  renderGroupChoices();
 
   if (changeBtn) {
     changeBtn.onclick = () => {
+      renderGroupChoices();
       if (typeof dialog.showModal === 'function') dialog.showModal();
     };
   }
@@ -785,6 +816,8 @@ function studentApp() {
     const s = read(), w = activeWord(s), playing = s.command === 'playing' && Date.now() < (s.endsAt || 0);
     const activeLesson = getActiveLesson(s);
     const words = activeLesson.words || [];
+
+    renderGroupChoices();
 
     if (lastCommand !== 'playing' && s.command === 'playing') {
       playTone('unlock');
@@ -873,6 +906,7 @@ function studentApp() {
     const s = read(), w = activeWord(s);
     if (!w || s.command !== 'playing') return;
     if (!group) {
+      renderGroupChoices();
       dialog.showModal();
       return;
     }
@@ -918,7 +952,10 @@ function studentApp() {
     render();
   }
 
-  window.addEventListener('roomchange', render);
+  window.addEventListener('roomchange', () => {
+    renderGroupChoices();
+    render();
+  });
   setInterval(render, 500);
   render();
 }
