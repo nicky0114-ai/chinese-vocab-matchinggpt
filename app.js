@@ -1,5 +1,5 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getDatabase, onValue, ref, runTransaction } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+import { getDatabase, onValue, ref, runTransaction, set } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 import { firebaseConfig } from './firebase-config.js';
 
 const ROOM_KEY = 'vocab-bright-room-v1';
@@ -191,7 +191,7 @@ function seconds(s) {
 function isGroupOnline(presence, groupId) {
   if (!presence) return false;
   const ts = presence[groupId] ?? presence[String(groupId)] ?? 0;
-  return typeof ts === 'number' && (Date.now() - ts < 15000);
+  return typeof ts === 'number' && (Date.now() - ts < 25000);
 }
 
 function getAllLessons(state) {
@@ -844,12 +844,10 @@ function studentApp() {
 
   function presence() {
     if (!group) return;
-    const s = read();
-    s.presence = s.presence || {};
-    s.presence[group] = Date.now();
-    write(s);
+    const pRef = ref(database, `vocab_rooms/room603/state/presence/${group}`);
+    set(pRef, Date.now()).catch(() => {});
   }
-  setInterval(presence, 4000);
+  setInterval(presence, 3000);
   presence();
 
   function render() {
@@ -987,7 +985,8 @@ function studentApp() {
 
     s.answers = s.answers || {};
     s.answers[group] = a;
-    write(s);
+    const aRef = ref(database, `vocab_rooms/room603/state/answers/${group}`);
+    set(aRef, a).catch(() => {});
     selected = null;
     render();
   }
