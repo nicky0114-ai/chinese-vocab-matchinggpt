@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>自主練習｜生字語詞小組配對</title>
+  <link rel="stylesheet" href="styles.css?v=3.4.0">
+</head>
+<body data-page="practice">
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">自</span>
+      <span>生字語詞自主練習<small>學生個人獨立操作端</small></span>
+    </a>
+    <div style="display:flex;gap:12px;align-items:center;">
+      <button id="changeProfileBtn" class="cloud-status-btn">● <span id="studentInfoBadge">未填寫身分</span> (修改資料)</button>
+      <span class="cloud-status">● 雲端連線中</span>
+    </div>
+  </header>
+
+  <main class="student-main">
+    <section class="control-panel practice-hero">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;">
+        <div>
+          <p class="eyebrow">📖 課本與生字選擇</p>
+          <h1>隨選隨練，自主掌握學習進度</h1>
+          <p class="muted">選擇老師開放的課別與挑戰生字，完成配對即時記錄於雲端，方便老師進行全班迷思檢討。</p>
+        </div>
+        <div id="timeWindowStatus" class="status-badge success" style="margin:0;">
+          🟢 開放時間：全天開放
+        </div>
+      </div>
+
+      <div class="controls" style="margin-top:20px;">
+        <label>開放課別
+          <select id="practiceLessonSelect">
+            <option value="">載入課別中...</option>
+          </select>
+        </label>
+        <label>選擇練習生字
+          <select id="practiceWordSelect">
+            <option value="0">【衫】字生字配對</option>
+          </select>
+        </label>
+      </div>
+
+      <div style="margin-top:16px;">
+        <p class="eyebrow" style="font-size:13px;">📚 本課生字快速選單</p>
+        <div id="practiceWordChips" class="word-chips"></div>
+      </div>
+    </section>
+
+    <section id="practiceTaskPanel" class="task-panel" style="margin-top:24px;">
+      <div class="task-title">
+        <div id="practiceCharBadge" class="char-badge">?</div>
+        <div>
+          <h1 id="practiceTaskTitle">選擇生字後開始配對</h1>
+          <p id="practiceTaskHint" class="muted">點擊左側「語詞」與右側「詞義解釋」卡片進行配對。</p>
+        </div>
+      </div>
+
+      <div class="matching-head">
+        <span>✏️ 語詞卡片（點擊選擇）</span>
+        <span>📖 詞義解釋卡片（點擊對應）</span>
+      </div>
+      <div id="practiceMatchingGrid" class="matching-grid"></div>
+      <p id="practiceFeedback" class="feedback"></p>
+    </section>
+  </main>
+
+  <dialog id="studentProfileDialog" class="login-dialog">
+    <form id="profileForm">
+      <span class="brand-mark">自</span>
+      <p class="eyebrow">學生自主練習</p>
+      <h2>請輸入您的學習資料</h2>
+      <p class="muted">輸入班級、座號與姓名，以便將練習成果同步給老師進行全班迷思檢討。</p>
+
+      <div style="display:flex;flex-direction:column;gap:12px;margin:18px 0;text-align:left;">
+        <label style="font-weight:700;font-size:14px;">班級
+          <input id="inputClass" type="text" placeholder="例如：603" required style="width:100%;margin-top:6px;">
+        </label>
+        <label style="font-weight:700;font-size:14px;">座號 (1~50)
+          <input id="inputSeat" type="number" min="1" max="50" placeholder="例如：15" required style="width:100%;margin-top:6px;">
+        </label>
+        <label style="font-weight:700;font-size:14px;">姓名
+          <input id="inputName" type="text" placeholder="例如：王小明" required style="width:100%;margin-top:6px;">
+        </label>
+      </div>
+
+      <button class="button success" type="submit" style="width:100%;">進入自主練習區</button>
+    </form>
+  </dialog>
+
+  <canvas id="confettiCanvas"></canvas>
+  <script type="module" src="app.js?v=3.4.0"></script>
+</body>
+</html>

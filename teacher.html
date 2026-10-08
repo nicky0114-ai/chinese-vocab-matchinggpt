@@ -1,21 +1,86 @@
 <!doctype html>
 <html lang="zh-Hant">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>教師主控台｜生字語詞闖關</title><link rel="stylesheet" href="styles.css?v=3.3.0"><script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>教師主控台｜生字語詞闖關與自主練習</title><link rel="stylesheet" href="styles.css?v=3.4.0"><script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script></head>
 <body data-page="teacher">
-<header class="topbar"><a class="brand" href="index.html"><span class="brand-mark">字</span><span>生字語詞限時闖關<small>教師主控與檢討大螢幕</small></span></a><span class="cloud-status">● 本機同步測試模式</span></header>
-<main class="teacher-main">
-  <section class="control-panel"><div><p class="eyebrow">🎮 全班課堂廣播主控台</p><h1>派送任務，開始全班挑戰</h1><p class="muted">先選課別、生字與作答時間；開始後，所有已連線平板會同步解鎖。</p></div>
-    <div class="controls"><label>課別<select id="lessonSelect"><option value="l4" selected>六年級國語 L4</option><option value="l3">六年級國語 L3</option><option value="l2">六年級國語 L2</option></select></label><label>挑戰生字<select id="wordSelect"><option value="0">【衫】字生字配對 (6詞)</option><option value="1">【肌】字生字配對 (6詞)</option><option value="2">【沸】字生字配對 (6詞)</option><option value="3">【騰】字生字配對 (6詞)</option><option value="4">【兀】字生字配對 (6詞)</option><option value="5">【唯】字生字配對 (6詞)</option><option value="6">【勺】字生字配對 (6詞)</option><option value="7">【吶】字生字配對 (6詞)</option><option value="8">【握】字生字配對 (6詞)</option><option value="9">【抵】字生字配對 (6詞)</option><option value="10">【置】字生字配對 (6詞)</option><option value="11">【頒】字生字配對 (5詞)</option><option value="12">【屬】字生字配對 (6詞)</option><option value="13">【榮】字生字配對 (6詞)</option><option value="14">【搞】字生字配對 (6詞)</option><option value="15">【襯】字生字配對 (6詞)</option><option value="16">【惹】字生字配對 (6詞)</option><option value="17">【摟】字生字配對 (6詞)</option><option value="18">【黝】字生字配對 (2詞)</option></select></label><label>作答時間<select id="timeSelect"><option value="30">30 秒</option><option value="45">45 秒</option><option value="60" selected>60 秒</option><option value="90">90 秒</option><option value="120">120 秒</option></select></label><label>全班組數<select id="groupCountSelect"><option value="7" selected>7 組 (預設)</option><option value="8">8 組</option><option value="9">9 組</option><option value="10">10 組</option><option value="11">11 組</option><option value="12">12 組</option><option value="13">13 組</option><option value="14">14 組</option><option value="15">15 組</option><option value="16">16 組</option><option value="17">17 組</option><option value="18">18 組</option><option value="19">19 組</option><option value="20">20 組</option><option value="21">21 組</option><option value="22">22 組</option><option value="23">23 組</option><option value="24">24 組</option><option value="25">25 組</option><option value="26">26 組</option><option value="27">27 組</option><option value="28">28 組</option></select></label><button id="importBtn" class="import-button">＋ 匯入 PDF 教材</button></div>
+<header class="topbar">
+  <a class="brand" href="index.html"><span class="brand-mark">字</span><span>生字語詞限時闖關<small>教師主控與檢討大螢幕</small></span></a>
+  <div style="display:flex;gap:12px;align-items:center;">
+    <nav class="mode-tabs" style="display:flex;gap:8px;">
+      <button id="tabSyncMode" class="tab-btn active" style="padding:8px 16px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-weight:700;cursor:pointer;">🎮 課堂全班競賽</button>
+      <button id="tabSelfMode" class="tab-btn" style="padding:8px 16px;border-radius:12px;border:1px solid var(--line);background:transparent;color:var(--muted);font-weight:700;cursor:pointer;">📖 學生自主練習與檢討</button>
+    </nav>
+    <span class="cloud-status">● 雲端同步已連線</span>
+  </div>
+</header>
 
-    <div class="action-row"><button id="startBtn" class="button success">▶ 發布並開始作答</button><button id="stopBtn" class="button danger">■ 強制結束作答</button><button id="resetBtn" class="button quiet">↻ 重置本字</button></div>
-    <div><p class="status-label">各組連線狀態</p><div id="presence" class="presence-list"><span class="presence-chip" data-group="1">第 1 組 ⚪ 未連線</span><span class="presence-chip" data-group="2">第 2 組 ⚪ 未連線</span><span class="presence-chip" data-group="3">第 3 組 ⚪ 未連線</span><span class="presence-chip" data-group="4">第 4 組 ⚪ 未連線</span><span class="presence-chip" data-group="5">第 5 組 ⚪ 未連線</span><span class="presence-chip" data-group="6">第 6 組 ⚪ 未連線</span><span class="presence-chip" data-group="7">第 7 組 ⚪ 未連線</span></div></div>
-  </section>
-  <section id="importReview" class="import-review" hidden><div class="review-toolbar"><div><p class="eyebrow">PDF 匯入校對</p><h2 id="importReviewTitle">待校對課別</h2><p id="importReviewStatus" class="muted">正在準備教材內容。</p></div><button id="saveImportBtn" class="button success">儲存為課別題庫</button></div><div id="extractedWords" class="extracted-words"></div><details open><summary>檢視／修正擷取文字</summary><textarea id="extractedText" rows="12" placeholder="PDF 的文字會顯示在這裡；若是掃描檔，請在此貼上文字或手動建立生字。"></textarea></details></section>
-  <section class="review-heading"><div><p class="eyebrow">即時檢討</p><h2 id="reviewTitle">等待派送任務</h2><p id="reviewSub" class="muted">學生連線後，這裡會顯示各組的作答結果。</p></div><div id="countdown" class="countdown">--:--</div></section>
-  <section id="insight" class="insight"><span>🔎</span><div><strong>課堂檢討提示</strong><p>開始後，系統會自動整理最常被混淆的語詞。</p></div></section>
-  <section id="groupGrid" class="group-grid"></section>
+<main class="teacher-main">
+  <!-- SECTION 1: 課堂全班競賽 -->
+  <div id="sectionSyncMode">
+    <section class="control-panel"><div><p class="eyebrow">🎮 全班課堂廣播主控台</p><h1>派送任務，開始全班挑戰</h1><p class="muted">先選課別、生字與作答時間；開始後，所有已連線平板會同步解鎖。</p></div>
+      <div class="controls"><label>課別<select id="lessonSelect"><option value="l4" selected>六年級國語 L4</option><option value="l3">六年級國語 L3</option><option value="l2">六年級國語 L2</option></select></label><label>挑戰生字<select id="wordSelect"><option value="0">【衫】字生字配對 (6詞)</option><option value="1">【肌】字生字配對 (6詞)</option><option value="2">【沸】字生字配對 (6詞)</option><option value="3">【騰】字生字配對 (6詞)</option><option value="4">【兀】字生字配對 (6詞)</option><option value="5">【唯】字生字配對 (6詞)</option><option value="6">【勺】字生字配對 (6詞)</option><option value="7">【吶】字生字配對 (6詞)</option><option value="8">【握】字生字配對 (6詞)</option><option value="9">【抵】字生字配對 (6詞)</option><option value="10">【置】字生字配對 (6詞)</option><option value="11">【頒】字生字配對 (5詞)</option><option value="12">【屬】字生字配對 (6詞)</option><option value="13">【榮】字生字配對 (6詞)</option><option value="14">【搞】字生字配對 (6詞)</option><option value="15">【襯】字生字配對 (6詞)</option><option value="16">【惹】字生字配對 (6詞)</option><option value="17">【摟】字生字配對 (6詞)</option><option value="18">【黝】字生字配對 (2詞)</option></select></label><label>作答時間<select id="timeSelect"><option value="30">30 秒</option><option value="45">45 秒</option><option value="60" selected>60 秒</option><option value="90">90 秒</option><option value="120">120 秒</option></select></label><label>全班組數<select id="groupCountSelect"><option value="7" selected>7 組 (預設)</option><option value="8">8 組</option><option value="9">9 組</option><option value="10">10 組</option><option value="11">11 組</option><option value="12">12 組</option><option value="13">13 組</option><option value="14">14 組</option><option value="15">15 組</option><option value="16">16 組</option><option value="17">17 組</option><option value="18">18 組</option><option value="19">19 組</option><option value="20">20 組</option><option value="21">21 組</option><option value="22">22 組</option><option value="23">23 組</option><option value="24">24 組</option><option value="25">25 組</option><option value="26">26 組</option><option value="27">27 組</option><option value="28">28 組</option></select></label><button id="importBtn" class="import-button">＋ 匯入 PDF 教材</button></div>
+
+      <div class="action-row"><button id="startBtn" class="button success">▶ 發布並開始作答</button><button id="stopBtn" class="button danger">■ 強制結束作答</button><button id="resetBtn" class="button quiet">↻ 重置本字</button></div>
+      <div><p class="status-label">各組連線狀態</p><div id="presence" class="presence-list"><span class="presence-chip" data-group="1">第 1 組 ⚪ 未連線</span><span class="presence-chip" data-group="2">第 2 組 ⚪ 未連線</span><span class="presence-chip" data-group="3">第 3 組 ⚪ 未連線</span><span class="presence-chip" data-group="4">第 4 組 ⚪ 未連線</span><span class="presence-chip" data-group="5">第 5 組 ⚪ 未連線</span><span class="presence-chip" data-group="6">第 6 組 ⚪ 未連線</span><span class="presence-chip" data-group="7">第 7 組 ⚪ 未連線</span></div></div>
+    </section>
+
+    <section id="importReview" class="import-review" hidden><div class="review-toolbar"><div><p class="eyebrow">PDF 匯入校對</p><h2 id="importReviewTitle">待校對課別</h2><p id="importReviewStatus" class="muted">正在準備教材內容。</p></div><button id="saveImportBtn" class="button success">儲存為課別題庫</button></div><div id="extractedWords" class="extracted-words"></div><details open><summary>檢視／修正擷取文字</summary><textarea id="extractedText" rows="12" placeholder="PDF 的文字會顯示在這裡；若是掃描檔，請在此貼上文字或手動建立生字。"></textarea></details></section>
+    <section class="review-heading"><div><p class="eyebrow">即時檢討</p><h2 id="reviewTitle">等待派送任務</h2><p id="reviewSub" class="muted">學生連線後，這裡會顯示各組的作答結果。</p></div><div id="countdown" class="countdown">--:--</div></section>
+    <section id="insight" class="insight"><span>🔎</span><div><strong>課堂檢討提示</strong><p>開始後，系統會自動整理最常被混淆的語詞。</p></div></section>
+    <section id="groupGrid" class="group-grid"></section>
+  </div>
+
+  <!-- SECTION 2: 學生自主練習開放與檢討看板 -->
+  <div id="sectionSelfMode" style="display:none;">
+    <section class="control-panel">
+      <div>
+        <p class="eyebrow">📖 學生自主練習控制台</p>
+        <h1>開放時間區段與課別管理</h1>
+        <p class="muted">設定開放狀態、時間範圍與解鎖課別。學生登入後可隨時練習，不需等待老師按下發布。</p>
+      </div>
+
+      <div class="controls" style="margin-top:20px;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));">
+        <label>開放自主練習
+          <select id="selfPracticeEnabled">
+            <option value="true" selected>🟢 開放練習</option>
+            <option value="false">🔴 關閉練習</option>
+          </select>
+        </label>
+        <label>每日開放開始時間
+          <input type="time" id="selfPracticeStartTime" value="08:00" style="padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-weight:700;">
+        </label>
+        <label>每日開放結束時間
+          <input type="time" id="selfPracticeEndTime" value="17:00" style="padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-weight:700;">
+        </label>
+      </div>
+
+      <div style="margin-top:18px;">
+        <p class="eyebrow" style="font-size:14px;margin-bottom:8px;">🔓 解鎖開放之課別（可複選）</p>
+        <div id="selfPracticeLessonCheckboxes" style="display:flex;flex-wrap:wrap;gap:12px;"></div>
+      </div>
+
+      <div class="action-row" style="margin-top:20px;">
+        <button id="saveSelfPracticeConfigBtn" class="button success">💾 儲存自主練習設定</button>
+      </div>
+    </section>
+
+    <section class="review-heading" style="margin-top:24px;">
+      <div>
+        <p class="eyebrow">📊 全班自主練習數據與迷思檢討看板</p>
+        <h2>學生個人練習進度與全班錯誤分析</h2>
+        <p class="muted">依「座號」排序顯示全班作答概況，大螢幕自動提煉出學生最常出錯的迷思語詞。</p>
+      </div>
+    </section>
+
+    <section id="selfPracticeInsight" class="insight" style="margin-top:16px;"></section>
+
+    <div style="margin-top:24px;">
+      <h3 style="margin-bottom:12px;display:flex;align-items:center;gap:8px;">👥 全班學生自主練習名冊 <small id="selfPracticeStudentCount" class="muted">(0 人已登入練習)</small></h3>
+      <div id="selfPracticeStudentGrid" class="group-grid" style="grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));"></div>
+    </div>
+  </div>
 </main>
+
 <dialog id="teacherLogin" class="login-dialog"><form id="teacherLoginForm"><span class="brand-mark">字</span><p class="eyebrow">教師專區</p><h2>請輸入主控密碼</h2><p class="muted">僅教師可發布任務與檢視全班結果。</p><input id="teacherPassword" type="password" inputmode="numeric" maxlength="4" autocomplete="current-password" placeholder="請輸入 4 碼密碼" autofocus><p id="loginError" class="login-error" aria-live="polite"></p><button class="button success" type="submit">進入教師主控台</button></form></dialog>
 <dialog id="importDialog" class="import-dialog"><form method="dialog"><div class="import-title"><span class="brand-mark">PDF</span><div><p class="eyebrow">建立新課別</p><h2>匯入生字教材 PDF</h2></div></div><p class="muted">選取教材後，會建立待校對課別，接著確認生字、語詞、詞義與成語。</p><label class="file-drop" for="pdfInput"><span>📄</span><strong>選擇 PDF 檔案</strong><small>支援國語生字教材 PDF</small><input id="pdfInput" type="file" accept="application/pdf,.pdf"></label><p id="pdfName" class="pdf-name">尚未選擇檔案</p><label class="import-field">課別名稱<input id="importLessonName" placeholder="例如：六年級國語 L2"></label><div class="import-actions"><button id="createImportBtn" type="button" class="button success" disabled>下一步：校對題庫</button><button class="quiet" value="cancel">取消</button></div></form></dialog>
-<script type="module" src="app.js?v=3.3.0"></script></body>
+<script type="module" src="app.js?v=3.4.0"></script></body>
 </html>

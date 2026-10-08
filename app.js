@@ -117,6 +117,13 @@ function baseState() {
     presence: {},
     answers: {},
     lessons: getStoredLessons(),
+    selfPracticeConfig: {
+      enabled: true,
+      startTime: "08:00",
+      endTime: "17:00",
+      allowedLessons: ["l4", "l3", "l2"]
+    },
+    selfPracticeRecords: {},
     updatedAt: Date.now()
   };
 }
@@ -466,6 +473,7 @@ function parseTextToLesson(title, text) {
 
 if (document.body.dataset.page === 'teacher') teacherApp();
 else if (document.body.dataset.page === 'student') studentApp();
+else if (document.body.dataset.page === 'practice') practiceApp();
 
 function teacherApp() {
   const lessonSelect = document.querySelector('#lessonSelect'),
@@ -788,6 +796,177 @@ function teacherApp() {
         ` : `<p class="muted">${on ? '🟢 等待小組在平板上開始自由連線配對…' : '⚪ 尚未連線報到'}</p>`}
       </article>`;
     }).join('');
+
+    renderSelfPracticeConfigInputs();
+    renderSelfPracticeDashboard();
+  }
+
+  // Mode Tab Switcher
+  const tabSyncMode = document.querySelector('#tabSyncMode');
+  const tabSelfMode = document.querySelector('#tabSelfMode');
+  const sectionSyncMode = document.querySelector('#sectionSyncMode');
+  const sectionSelfMode = document.querySelector('#sectionSelfMode');
+
+  if (tabSyncMode && tabSelfMode && sectionSyncMode && sectionSelfMode) {
+    tabSyncMode.onclick = () => {
+      tabSyncMode.classList.add('active');
+      tabSyncMode.style.background = 'var(--card)';
+      tabSyncMode.style.color = 'var(--ink)';
+      tabSelfMode.classList.remove('active');
+      tabSelfMode.style.background = 'transparent';
+      tabSelfMode.style.color = 'var(--muted)';
+      sectionSyncMode.style.display = 'block';
+      sectionSelfMode.style.display = 'none';
+    };
+
+    tabSelfMode.onclick = () => {
+      tabSelfMode.classList.add('active');
+      tabSelfMode.style.background = 'var(--card)';
+      tabSelfMode.style.color = 'var(--ink)';
+      tabSyncMode.classList.remove('active');
+      tabSyncMode.style.background = 'transparent';
+      tabSyncMode.style.color = 'var(--muted)';
+      sectionSelfMode.style.display = 'block';
+      sectionSyncMode.style.display = 'none';
+    };
+  }
+
+  // Self Practice Config Handlers
+  const selfPracticeEnabled = document.querySelector('#selfPracticeEnabled');
+  const selfPracticeStartTime = document.querySelector('#selfPracticeStartTime');
+  const selfPracticeEndTime = document.querySelector('#selfPracticeEndTime');
+  const saveSelfPracticeConfigBtn = document.querySelector('#saveSelfPracticeConfigBtn');
+  const selfPracticeLessonCheckboxes = document.querySelector('#selfPracticeLessonCheckboxes');
+
+  function renderSelfPracticeConfigInputs() {
+    const s = read();
+    const cfg = s.selfPracticeConfig || { enabled: true, startTime: '08:00', endTime: '17:00', allowedLessons: ['l4', 'l3', 'l2'] };
+    if (selfPracticeEnabled) selfPracticeEnabled.value = String(cfg.enabled !== false);
+    if (selfPracticeStartTime && document.activeElement !== selfPracticeStartTime) selfPracticeStartTime.value = cfg.startTime || '08:00';
+    if (selfPracticeEndTime && document.activeElement !== selfPracticeEndTime) selfPracticeEndTime.value = cfg.endTime || '17:00';
+
+    if (selfPracticeLessonCheckboxes && !selfPracticeLessonCheckboxes.dataset.rendered) {
+      const lessons = getAllLessons(s);
+      const allowed = cfg.allowedLessons || lessons.map(l => l.id);
+      selfPracticeLessonCheckboxes.innerHTML = lessons.map(l => `
+        <label style="display:inline-flex;align-items:center;gap:6px;background:var(--bg);padding:8px 14px;border-radius:12px;border:1px solid var(--line);cursor:pointer;font-weight:700;">
+          <input type="checkbox" class="self-lesson-cb" value="${l.id}" ${allowed.includes(l.id) ? 'checked' : ''}>
+          <span>${l.title} (${l.words ? l.words.length : 0}字)</span>
+        </label>
+      `).join('');
+      selfPracticeLessonCheckboxes.dataset.rendered = 'true';
+    }
+  }
+
+  if (saveSelfPracticeConfigBtn) {
+    saveSelfPracticeConfigBtn.onclick = () => {
+      const selectedLessons = Array.from(document.querySelectorAll('.self-lesson-cb:checked')).map(cb => cb.value);
+      const newCfg = {
+        enabled: selfPracticeEnabled.value === 'true',
+        startTime: selfPracticeStartTime.value || '08:00',
+        endTime: selfPracticeEndTime.value || '17:00',
+        allowedLessons: selectedLessons
+      };
+      const cfgRef = ref(database, 'vocab_rooms/room603/state/selfPracticeConfig');
+      set(cfgRef, newCfg).then(() => {
+        alert('🎉 已成功儲存學生自主練習開放設定！');
+      }).catch(err => {
+        console.error(err);
+        alert('儲存失敗，請檢查網路。');
+      });
+    };
+  }
+
+  function renderSelfPracticeDashboard() {
+    const s = read();
+    const recordsObj = s.selfPracticeRecords || {};
+    const students = Object.values(recordsObj);
+
+    students.sort((a, b) => {
+      if ((a.className || '') !== (b.className || '')) {
+        return (a.className || '').localeCompare(b.className || '');
+      }
+      return (+a.seat || 0) - (+b.seat || 0);
+    });
+
+    const countEl = document.querySelector('#selfPracticeStudentCount');
+    if (countEl) countEl.textContent = `(${students.length} 人已登入練習)`;
+
+    const errorMap = {};
+    students.forEach(st => {
+      const history = st.history || {};
+      Object.values(history).forEach(rec => {
+        (rec.wrong || []).forEach(t => {
+          errorMap[t] = (errorMap[t] || 0) + 1;
+        });
+      });
+    });
+
+    const topErrors = Object.entries(errorMap).sort((a, b) => b[1] - a[1]).slice(0, 3);
+    const insightEl = document.querySelector('#selfPracticeInsight');
+    if (insightEl) {
+      if (topErrors.length > 0) {
+        insightEl.innerHTML = `
+          <div class="insight-alert" style="width:100%;">
+            <span style="font-size:32px">🔥</span>
+            <div>
+              <strong>自主練習全班迷思語詞 Top ${topErrors.length} 排行榜：</strong>
+              <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:10px;">
+                ${topErrors.map(([term, count], idx) => `
+                  <span style="background:rgba(239,68,68,0.2);color:#fca5a5;padding:4px 12px;border-radius:20px;font-weight:800;border:1px solid rgba(239,68,68,0.4);">
+                    第 ${idx + 1} 名：【${term}】（全班累計 ${count} 人次出錯）
+                  </span>
+                `).join('')}
+              </div>
+              <p style="margin-top:8px;font-size:13px;color:var(--muted);">引導說明：此榜單即時統計自所有獨立自主練習學生作答結果。</p>
+            </div>
+          </div>
+        `;
+      } else {
+        insightEl.innerHTML = `
+          <div class="insight-hint" style="width:100%;">
+            <span style="font-size:26px">🔎</span>
+            <div>
+              <strong>全班自主練習檢討提示</strong>
+              <p>學生進行自主練習後，系統會在此自動彙整並提煉全班出錯率最高的迷思語詞。</p>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    const gridEl = document.querySelector('#selfPracticeStudentGrid');
+    if (gridEl) {
+      if (!students.length) {
+        gridEl.innerHTML = '<p class="muted" style="grid-column:1/-1;text-align:center;padding:36px;background:var(--card);border-radius:18px;border:1px solid var(--line);">目前尚無學生登入進行自主練習。</p>';
+        return;
+      }
+
+      gridEl.innerHTML = students.map(st => {
+        const completedWords = st.completedWords || 0;
+        const totalCorrect = st.totalCorrect || 0;
+        const totalWrong = st.totalWrong || 0;
+        const totalAttempts = totalCorrect + totalWrong;
+        const accuracy = totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 100;
+
+        return `
+          <article class="group-card online" style="padding:16px;">
+            <div class="group-card-header" style="margin-bottom:10px;">
+              <h3 style="font-size:17px;margin:0;">
+                <span style="background:var(--blue);color:#fff;padding:2px 8px;border-radius:8px;font-size:13px;margin-right:6px;">${st.seat || '?'}號</span>
+                ${st.name || '未命名'}
+                <small style="color:var(--muted);font-size:12px;display:block;margin-top:2px;">${st.className || ''} 班</small>
+              </h3>
+              <span class="score-tag ${accuracy >= 80 ? '' : 'quiet'}" style="font-size:12px;">正確率 ${accuracy}%</span>
+            </div>
+            <div style="font-size:13px;color:var(--muted);display:flex;justify-content:space-between;margin-bottom:8px;">
+              <span>已完成字數：<strong style="color:var(--ink);">${completedWords} 字</strong></span>
+              <span>累計答對：<strong style="color:#10b981;">${totalCorrect} 題</strong></span>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
   }
 
   window.addEventListener('roomchange', () => {
@@ -996,5 +1175,307 @@ function studentApp() {
     render();
   });
   setInterval(render, 500);
+  render();
+}
+
+function practiceApp() {
+  let profile = JSON.parse(localStorage.getItem('vocab-self-profile')) || null;
+  let activeLessonId = 'l4';
+  let activeWordIndex = 0;
+  let selected = null;
+  let termOrder = [];
+  let celebratedWord = '';
+
+  const dialog = document.querySelector('#studentProfileDialog');
+  const profileForm = document.querySelector('#profileForm');
+  const changeProfileBtn = document.querySelector('#changeProfileBtn');
+  const studentInfoBadge = document.querySelector('#studentInfoBadge');
+
+  function updateProfileBadge() {
+    if (studentInfoBadge) {
+      studentInfoBadge.textContent = profile ? `${profile.className}班 ${profile.seat}號 ${profile.name}` : '未填寫身分';
+    }
+  }
+  updateProfileBadge();
+
+  if (!profile && dialog && typeof dialog.showModal === 'function') {
+    dialog.showModal();
+  }
+
+  if (changeProfileBtn && dialog) {
+    changeProfileBtn.onclick = () => {
+      if (profile) {
+        document.querySelector('#inputClass').value = profile.className || '';
+        document.querySelector('#inputSeat').value = profile.seat || '';
+        document.querySelector('#inputName').value = profile.name || '';
+      }
+      if (typeof dialog.showModal === 'function') dialog.showModal();
+    };
+  }
+
+  if (profileForm) {
+    profileForm.onsubmit = e => {
+      e.preventDefault();
+      profile = {
+        className: document.querySelector('#inputClass').value.trim(),
+        seat: +document.querySelector('#inputSeat').value,
+        name: document.querySelector('#inputName').value.trim()
+      };
+      localStorage.setItem('vocab-self-profile', JSON.stringify(profile));
+      updateProfileBadge();
+      if (dialog.open) dialog.close();
+      render();
+    };
+  }
+
+  const practiceLessonSelect = document.querySelector('#practiceLessonSelect');
+  const practiceWordSelect = document.querySelector('#practiceWordSelect');
+
+  if (practiceLessonSelect) {
+    practiceLessonSelect.onchange = () => {
+      activeLessonId = practiceLessonSelect.value;
+      activeWordIndex = 0;
+      termOrder = [];
+      selected = null;
+      render();
+    };
+  }
+
+  if (practiceWordSelect) {
+    practiceWordSelect.onchange = () => {
+      activeWordIndex = +practiceWordSelect.value;
+      termOrder = [];
+      selected = null;
+      render();
+    };
+  }
+
+  function render() {
+    const s = read();
+    const cfg = s.selfPracticeConfig || { enabled: true, startTime: '08:00', endTime: '17:00', allowedLessons: ['l4', 'l3', 'l2'] };
+
+    const timeStatusEl = document.querySelector('#timeWindowStatus');
+    const now = new Date();
+    const curTimeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const startStr = cfg.startTime || '08:00';
+    const endStr = cfg.endTime || '17:00';
+
+    const isEnabled = cfg.enabled !== false;
+    const inTimeWindow = curTimeStr >= startStr && curTimeStr <= endStr;
+    const isUnlocked = isEnabled && inTimeWindow;
+
+    if (timeStatusEl) {
+      if (!isEnabled) {
+        timeStatusEl.className = 'status-badge warning';
+        timeStatusEl.textContent = '🔴 目前自主練習已暫停開放';
+      } else if (!inTimeWindow) {
+        timeStatusEl.className = 'status-badge warning';
+        timeStatusEl.textContent = `⏰ 非開放時間（每日開放：${startStr} - ${endStr}）`;
+      } else {
+        timeStatusEl.className = 'status-badge success';
+        timeStatusEl.textContent = `🟢 自主練習開放中（時段：${startStr} - ${endStr}）`;
+      }
+    }
+
+    const allLessons = getAllLessons(s);
+    const allowedIds = cfg.allowedLessons || allLessons.map(l => l.id);
+    const availableLessons = allLessons.filter(l => allowedIds.includes(l.id));
+    const lessonsToUse = availableLessons.length ? availableLessons : allLessons;
+
+    if (practiceLessonSelect) {
+      const lessonHtml = lessonsToUse.map(l => `<option value="${l.id}">${l.title} (${l.words ? l.words.length : 0}字)</option>`).join('');
+      if (practiceLessonSelect.innerHTML !== lessonHtml) {
+        practiceLessonSelect.innerHTML = lessonHtml;
+      }
+      if (lessonsToUse.some(l => l.id === activeLessonId)) {
+        practiceLessonSelect.value = activeLessonId;
+      } else {
+        activeLessonId = lessonsToUse[0].id;
+        practiceLessonSelect.value = activeLessonId;
+      }
+    }
+
+    const currentLesson = lessonsToUse.find(l => l.id === activeLessonId) || lessonsToUse[0];
+    const words = (currentLesson && currentLesson.words) ? currentLesson.words : [];
+
+    if (practiceWordSelect) {
+      const wordHtml = words.map((w, i) => `<option value="${i}">【${w.char}】字生字配對 (${(w.terms || []).length}詞)</option>`).join('');
+      if (practiceWordSelect.innerHTML !== wordHtml) {
+        practiceWordSelect.innerHTML = wordHtml;
+      }
+      practiceWordSelect.value = activeWordIndex < words.length ? activeWordIndex : 0;
+    }
+
+    const chipsEl = document.querySelector('#practiceWordChips');
+    if (chipsEl) {
+      chipsEl.innerHTML = words.map((x, i) =>
+        `<span class="word-chip ${i === activeWordIndex ? 'active' : ''}">${x.char}</span>`
+      ).join('');
+      chipsEl.querySelectorAll('.word-chip').forEach((chip, i) => {
+        chip.onclick = () => {
+          activeWordIndex = i;
+          termOrder = [];
+          selected = null;
+          render();
+        };
+      });
+    }
+
+    const w = words[activeWordIndex] || words[0];
+    const charBadge = document.querySelector('#practiceCharBadge');
+    if (charBadge) charBadge.textContent = w ? w.char : '?';
+
+    const titleEl = document.querySelector('#practiceTaskTitle');
+    if (titleEl) titleEl.textContent = isUnlocked ? `【${profile ? profile.name : '自主'}】生字【${w ? w.char : '?'}】個人配對練習` : '目前非開放練習時間';
+
+    const hintEl = document.querySelector('#practiceTaskHint');
+    if (hintEl) hintEl.textContent = isUnlocked ? '點擊左側「語詞」與右側「詞義解釋」卡片進行配對，紀錄將同步提供全班檢討。' : `請在開放時間（${startStr} - ${endStr}）內進行練習。`;
+
+    const taskPanel = document.querySelector('#practiceTaskPanel');
+    if (taskPanel) taskPanel.classList.toggle('locked', !isUnlocked);
+
+    if (w && (!termOrder.length || termOrder[0]?.word !== w.char)) {
+      termOrder = shuffle((w.terms || []).map(([term, meaning]) => ({ word: w.char, term, meaning })));
+      selected = null;
+    }
+
+    drawPracticeCards(w, isUnlocked);
+  }
+
+  function drawPracticeCards(w, isUnlocked) {
+    if (!w || !w.terms) return;
+    const studentKey = profile ? `${profile.className}_${profile.seat}` : 'anonymous';
+    const s = read();
+    const stRecord = (s.selfPracticeRecords && s.selfPracticeRecords[studentKey]) || {};
+    const wordHistory = (stRecord.history && stRecord.history[w.char]) || { pairs: {}, correct: 0, wrong: [], complete: false };
+
+    const leftTerms = (w.terms || []).map(t => t[0]);
+    const right = termOrder;
+
+    const pairedCount = Object.keys(wordHistory.pairs || {}).length;
+    const totalCount = leftTerms.length;
+
+    if (wordHistory.complete && celebratedWord !== w.char && wordHistory.correct === totalCount) {
+      celebratedWord = w.char;
+      triggerConfetti();
+      playTone('victory');
+    }
+
+    const leftHtml = leftTerms.map(term => {
+      const isPaired = !!(wordHistory.pairs && wordHistory.pairs[term]);
+      const isSelected = selected?.type === 'term' && selected.value === term;
+      return `<button class="match-card ${isSelected ? 'selected' : ''} ${isPaired ? 'paired' : ''}" data-type="term" data-value="${term}">
+        <span>${term}</span>
+        ${isPaired ? '<span class="check-badge">✓</span>' : ''}
+      </button>`;
+    }).join('');
+
+    const rightHtml = right.map(x => {
+      const meaning = x.meaning;
+      const pairedTerm = Object.keys(wordHistory.pairs || {}).find(t => wordHistory.pairs[t] === meaning);
+      const pairedTermIndex = pairedTerm ? leftTerms.indexOf(pairedTerm) + 1 : 0;
+      const isSelected = selected?.type === 'meaning' && selected.value === meaning;
+
+      return `<button class="match-card ${isSelected ? 'selected' : ''} ${pairedTermIndex > 0 ? 'paired' : ''}" data-type="meaning" data-value="${meaning.replaceAll('&', '&amp;').replaceAll('"', '&quot;')}">
+        <span class="meaning-text">${meaning}</span>
+        ${pairedTermIndex > 0 ? `<span class="badge-num">${pairedTermIndex}</span>` : ''}
+      </button>`;
+    }).join('');
+
+    const gridEl = document.querySelector('#practiceMatchingGrid');
+    if (gridEl) gridEl.innerHTML = `<div>${leftHtml}</div><div>${rightHtml}</div>`;
+
+    const feedbackEl = document.querySelector('#practiceFeedback');
+    if (feedbackEl) {
+      if (pairedCount === totalCount && totalCount > 0) {
+        feedbackEl.innerHTML = `<div class="status-badge success">🎉 太棒了！已完成全數配對 (${pairedCount}/${totalCount})！微調後紀錄將同步雲端。</div>`;
+      } else if (pairedCount > 0) {
+        feedbackEl.innerHTML = `<div class="status-badge warning">已配對 ${pairedCount}/${totalCount} 題，繼續加油！</div>`;
+      } else {
+        feedbackEl.innerHTML = `<div class="status-badge info">💡 點擊左側「語詞」與右側「詞義解釋」卡片進行配對</div>`;
+      }
+    }
+
+    if (isUnlocked) {
+      document.querySelectorAll('#practiceMatchingGrid .match-card').forEach(b => {
+        b.onclick = () => {
+          playTone('click');
+          choosePractice(b.dataset.value, b.dataset.type, w);
+        };
+      });
+    }
+  }
+
+  function choosePractice(value, type, w) {
+    if (!profile) {
+      if (dialog && typeof dialog.showModal === 'function') dialog.showModal();
+      return;
+    }
+    if (!selected) {
+      selected = { value, type };
+      render();
+      return;
+    }
+    if (selected.type === type) {
+      selected = { value, type };
+      render();
+      return;
+    }
+
+    const term = selected.type === 'term' ? selected.value : value;
+    const meaning = selected.type === 'meaning' ? selected.value : value;
+
+    const studentKey = `${profile.className}_${profile.seat}`;
+    const s = read();
+    s.selfPracticeRecords = s.selfPracticeRecords || {};
+    const stRecord = s.selfPracticeRecords[studentKey] || {
+      className: profile.className,
+      seat: profile.seat,
+      name: profile.name,
+      completedWords: 0,
+      totalCorrect: 0,
+      totalWrong: 0,
+      history: {}
+    };
+
+    stRecord.history = stRecord.history || {};
+    const wordHistory = stRecord.history[w.char] || { pairs: {}, correct: 0, wrong: [], complete: false };
+    wordHistory.pairs = wordHistory.pairs || {};
+    wordHistory.pairs[term] = meaning;
+
+    let correctCount = 0;
+    const wrongTerms = [];
+    w.terms.forEach(([t, m]) => {
+      const userChoice = wordHistory.pairs[t];
+      if (userChoice === m) correctCount++;
+      else if (userChoice && userChoice !== m) wrongTerms.push(t);
+    });
+
+    wordHistory.correct = correctCount;
+    wordHistory.wrong = wrongTerms;
+    wordHistory.complete = Object.keys(wordHistory.pairs).length === w.terms.length;
+
+    stRecord.history[w.char] = wordHistory;
+
+    let compCount = 0, totCorr = 0, totWrng = 0;
+    Object.values(stRecord.history).forEach(h => {
+      if (h.complete) compCount++;
+      totCorr += (h.correct || 0);
+      totWrng += ((h.wrong && h.wrong.length) || 0);
+    });
+
+    stRecord.completedWords = compCount;
+    stRecord.totalCorrect = totCorr;
+    stRecord.totalWrong = totWrng;
+    stRecord.updatedAt = Date.now();
+
+    const recordRef = ref(database, `vocab_rooms/room603/state/selfPracticeRecords/${studentKey}`);
+    set(recordRef, stRecord).catch(err => console.error(err));
+
+    selected = null;
+    render();
+  }
+
+  window.addEventListener('roomchange', render);
   render();
 }
