@@ -1286,11 +1286,11 @@ function studentApp() {
     // Feedback badge prompt
     const feedbackEl = document.querySelector('#feedback');
     if (pairedCount === totalCount && totalCount > 0) {
-      feedbackEl.innerHTML = `<div class="status-badge success">已完成全數配對 (${pairedCount}/${totalCount})！可點擊卡片隨時調整配對，請靜候老師大螢幕檢討。</div>`;
+      feedbackEl.innerHTML = `<div class="status-badge success">已完成全數配對 (${pairedCount}/${totalCount})！若需修改：點語詞再點新解釋可直接換配；點相同配對可取消。</div>`;
     } else if (pairedCount > 0) {
-      feedbackEl.innerHTML = `<div class="status-badge warning">已配對 ${pairedCount}/${totalCount} 題，請再討論調整！</div>`;
+      feedbackEl.innerHTML = `<div class="status-badge warning">已配對 ${pairedCount}/${totalCount} 題！若選錯：點語詞再點新解釋可直接換配；點相同配對可取消。</div>`;
     } else {
-      feedbackEl.innerHTML = `<div class="status-badge info">💡 點擊左側「語詞」與右側「詞義解釋」卡片進行自由配對</div>`;
+      feedbackEl.innerHTML = `<div class="status-badge info">💡 點擊左側「語詞」與右側「詞義解釋」卡片配對（選錯時點新卡片直接換配，點同一組可取消）</div>`;
     }
 
     document.querySelectorAll('.match-card').forEach(b => {
@@ -1326,7 +1326,18 @@ function studentApp() {
 
     const a = (s.answers && s.answers[group]) || { pairs: {}, correct: 0, wrong: [], complete: false };
     a.pairs = a.pairs || {};
-    a.pairs[term] = meaning;
+    if (a.pairs[term] === meaning) {
+      // 點擊同一組已配對的項目 -> 解除配對（取消）
+      delete a.pairs[term];
+    } else {
+      // 1對1配對保障：若該詞義之前已被其他語詞配對，先解除舊語詞的配對
+      for (const t of Object.keys(a.pairs)) {
+        if (a.pairs[t] === meaning) {
+          delete a.pairs[t];
+        }
+      }
+      a.pairs[term] = meaning;
+    }
 
     // Evaluate answers silently for teacher's real-time dashboard analytics
     let correctCount = 0;
@@ -1570,11 +1581,11 @@ function practiceApp() {
     const feedbackEl = document.querySelector('#practiceFeedback');
     if (feedbackEl) {
       if (pairedCount === totalCount && totalCount > 0) {
-        feedbackEl.innerHTML = `<div class="status-badge success">🎉 太棒了！已完成全數配對 (${pairedCount}/${totalCount})！微調後紀錄將同步雲端。</div>`;
+        feedbackEl.innerHTML = `<div class="status-badge success">🎉 太棒了！已完成全數配對 (${pairedCount}/${totalCount})！若需修改：點語詞再點新解釋可直接換配；點相同配對可取消。</div>`;
       } else if (pairedCount > 0) {
-        feedbackEl.innerHTML = `<div class="status-badge warning">已配對 ${pairedCount}/${totalCount} 題，繼續加油！</div>`;
+        feedbackEl.innerHTML = `<div class="status-badge warning">已配對 ${pairedCount}/${totalCount} 題！若選錯：點語詞再點新解釋可直接換配；點相同配對可取消。</div>`;
       } else {
-        feedbackEl.innerHTML = `<div class="status-badge info">💡 點擊左側「語詞」與右側「詞義解釋」卡片進行配對</div>`;
+        feedbackEl.innerHTML = `<div class="status-badge info">💡 點擊左側「語詞」與右側「詞義解釋」卡片配對（選錯時點新卡片直接換配，點同一組可取消）</div>`;
       }
     }
 
@@ -1623,7 +1634,18 @@ function practiceApp() {
     stRecord.history = stRecord.history || {};
     const wordHistory = stRecord.history[w.char] || { pairs: {}, correct: 0, wrong: [], complete: false };
     wordHistory.pairs = wordHistory.pairs || {};
-    wordHistory.pairs[term] = meaning;
+    if (wordHistory.pairs[term] === meaning) {
+      // 點擊同一組已配對的項目 -> 解除配對（取消）
+      delete wordHistory.pairs[term];
+    } else {
+      // 1對1配對保障：若該詞義之前已被其他語詞配對，先解除舊語詞的配對
+      for (const t of Object.keys(wordHistory.pairs)) {
+        if (wordHistory.pairs[t] === meaning) {
+          delete wordHistory.pairs[t];
+        }
+      }
+      wordHistory.pairs[term] = meaning;
+    }
 
     let correctCount = 0;
     const wrongTerms = [];
