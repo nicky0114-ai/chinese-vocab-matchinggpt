@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="zh-Hant">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>教師主控台｜生字語詞闖關與自主練習</title><link rel="stylesheet" href="styles.css?v=3.4.0"><script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>教師主控台｜生字語詞闖關與自主練習</title><link rel="stylesheet" href="styles.css?v=3.5.0"><script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script></head>
 <body data-page="teacher">
 <header class="topbar">
   <a class="brand" href="index.html"><span class="brand-mark">字</span><span>生字語詞限時闖關<small>教師主控與檢討大螢幕</small></span></a>
@@ -8,6 +8,7 @@
     <nav class="mode-tabs" style="display:flex;gap:8px;">
       <button id="tabSyncMode" class="tab-btn active" style="padding:8px 16px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-weight:700;cursor:pointer;">🎮 課堂全班競賽</button>
       <button id="tabSelfMode" class="tab-btn" style="padding:8px 16px;border-radius:12px;border:1px solid var(--line);background:transparent;color:var(--muted);font-weight:700;cursor:pointer;">📖 學生自主練習與檢討</button>
+      <button id="tabEditorMode" class="tab-btn" style="padding:8px 16px;border-radius:12px;border:1px solid var(--line);background:transparent;color:var(--muted);font-weight:700;cursor:pointer;">📝 詞庫手動編輯</button>
     </nav>
     <span class="cloud-status">● 雲端同步已連線</span>
   </div>
@@ -78,9 +79,53 @@
       <div id="selfPracticeStudentGrid" class="group-grid" style="grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));"></div>
     </div>
   </div>
+
+  <!-- SECTION 3: 詞庫手動編輯器 -->
+  <div id="sectionEditorMode" style="display:none;">
+    <section class="control-panel">
+      <div>
+        <p class="eyebrow">📝 詞庫手動編輯器</p>
+        <h1>手動修改各課生字語詞配對</h1>
+        <p class="muted">選擇課別後點擊生字，可直接編輯語詞名稱與詞義解釋，或新增、刪除語詞，完成後點擊「儲存」同步至所有裝置。</p>
+      </div>
+      <div class="controls" style="margin-top:20px;">
+        <label>課別
+          <select id="editorLessonSelect"></select>
+        </label>
+      </div>
+      <div style="margin-top:16px;">
+        <p class="eyebrow" style="font-size:13px;margin-bottom:10px;">🔤 點選生字開始編輯</p>
+        <div id="editorCharList" style="display:flex;flex-wrap:wrap;gap:10px;"></div>
+      </div>
+    </section>
+
+    <section id="editorTermSection" style="display:none;margin-top:22px;padding:24px;background:#0f172a;border:2px solid #3b82f6;border-radius:22px;">
+      <div class="review-toolbar">
+        <div>
+          <p class="eyebrow">✏️ 語詞編輯區</p>
+          <h2 id="editorCharTitle">請選擇生字</h2>
+          <p id="editorTermCount" class="muted"></p>
+        </div>
+        <button id="editorSaveBtn" class="button success">💾 儲存此課所有修改</button>
+      </div>
+      <div id="editorTermList" style="margin-top:18px;display:grid;gap:10px;"></div>
+      <div style="margin-top:22px;border-top:1px solid var(--line);padding-top:18px;">
+        <p class="eyebrow" style="font-size:13px;margin-bottom:10px;">➕ 新增語詞配對</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+          <label style="flex:1;min-width:120px;font-weight:800;color:#94a3b8;">語詞名稱
+            <input id="editorNewTerm" type="text" placeholder="例：欣欣向榮" style="display:block;margin-top:6px;width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;">
+          </label>
+          <label style="flex:2;min-width:200px;font-weight:800;color:#94a3b8;">詞義解釋
+            <input id="editorNewMeaning" type="text" placeholder="例：草木生長茂盛，或比喻事業蓬勃發展。" style="display:block;margin-top:6px;width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;">
+          </label>
+          <button id="editorAddTermBtn" class="button success" style="white-space:nowrap;">➕ 新增語詞</button>
+        </div>
+      </div>
+    </section>
+  </div>
 </main>
 
 <dialog id="teacherLogin" class="login-dialog"><form id="teacherLoginForm"><span class="brand-mark">字</span><p class="eyebrow">教師專區</p><h2>請輸入主控密碼</h2><p class="muted">僅教師可發布任務與檢視全班結果。</p><input id="teacherPassword" type="password" inputmode="numeric" maxlength="4" autocomplete="current-password" placeholder="請輸入 4 碼密碼" autofocus><p id="loginError" class="login-error" aria-live="polite"></p><button class="button success" type="submit">進入教師主控台</button></form></dialog>
 <dialog id="importDialog" class="import-dialog"><form method="dialog"><div class="import-title"><span class="brand-mark">PDF</span><div><p class="eyebrow">建立新課別</p><h2>匯入生字教材 PDF</h2></div></div><p class="muted">選取教材後，會建立待校對課別，接著確認生字、語詞、詞義與成語。</p><label class="file-drop" for="pdfInput"><span>📄</span><strong>選擇 PDF 檔案</strong><small>支援國語生字教材 PDF</small><input id="pdfInput" type="file" accept="application/pdf,.pdf"></label><p id="pdfName" class="pdf-name">尚未選擇檔案</p><label class="import-field">課別名稱<input id="importLessonName" placeholder="例如：六年級國語 L2"></label><div class="import-actions"><button id="createImportBtn" type="button" class="button success" disabled>下一步：校對題庫</button><button class="quiet" value="cancel">取消</button></div></form></dialog>
-<script type="module" src="app.js?v=3.4.0"></script></body>
+<script type="module" src="app.js?v=3.5.0"></script></body>
 </html>

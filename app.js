@@ -1,5 +1,5 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getDatabase, onValue, ref, runTransaction, set } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+import { getDatabase, onValue, ref, runTransaction, set, remove } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 import { firebaseConfig } from './firebase-config.js';
 
 const ROOM_KEY = 'vocab-bright-room-v1';
@@ -36,11 +36,11 @@ const lessonL3 = {
     {char:'醅',terms:[['舊醅','陳年或家常未過濾的酒。'],['濁醅','未過濾的渾濁釀酒。'],['新醅','新釀造、尚未過濾的酒。'],['醅酒','未經濾過的粗酒。'],['釀醅','釀造粗酒。'],['覆醬覆醅','覆，蓋。指著作或手稿被用來蓋醬缸或酒缸，比喻著述毫無價值、不受重視而被廢棄。']]},
     {char:'籬',terms:[['籬笆','用竹子、木條或樹枝編成的圍牆。'],['竹籬','用竹子編成的籬笆。'],['藩籬','籬笆，比喻屏障、限制或界限。'],['圍籬','圍繞在周圍的防護籬笆。'],['寄人籬下','寄居在別人的籬笆下。比喻依附他人生活，不能獨立自主。']]},
     {char:'簡',terms:[['簡陋','房屋或設備簡單粗陋。'],['簡潔','說話或文章簡明乾淨，不拖泥帶水。'],['簡單','結構不複雜、容易明白。'],['竹簡','古代寫字用的竹片。'],['簡短','篇幅或時間短暫。'],['言簡意賅','賅，完備。言語簡練而意思完備。']]},
-    {char:'陋',terms:[['簡陋','房屋設備簡單粗陋。'],['僻陋','偏僻而落後的地方。'],['醜陋','外表不美觀，或指心靈骯髒。'],['陋習','不良的習俗或壞習慣。'],['孤陋寡聞','形容學識淺薄，見聞不廣。']]},
+    {char:'陋',terms:[['僻陋','偏僻而落後的地方。'],['醜陋','外表不美觀，或指心靈骯髒。'],['陋習','不良的習俗或壞習慣。'],['孤陋寡聞','形容學識淺薄，見聞不廣。']]},
     {char:'鎮',terms:[['鎮定','情緒穩定不慌張。'],['鄉鎮','地方行政區劃單位。'],['冰鎮','將食物放進冰櫃降溫以保持涼爽。'],['鎮壓','壓制、強行平息。'],['坐鎮','親自駐守、親自指揮。'],['鎮定自若','在危急或緊張的情況下，態度依然沉著冷靜，完全不慌張。']]},
     {char:'濾',terms:[['過濾','使液體或氣體通過濾材以除去雜質。'],['濾紙','用來過濾液體雜質的特殊紙張。'],['濾水器','淨化水質的設備。'],['濾網','攔截雜質的網狀結構。'],['濾過','指通過過濾裝置。']]},
     {char:'潺',terms:[['潺潺','水流的聲響，或形容水流動不息的樣子。'],['潺湲','水流緩慢流動的樣子。'],['潺潺流水','不停流淌的小溪水。']]},
-    {char:'笆',terms:[['籬笆','用竹子或柳條編成的圍牆。'],['笆斗','用竹子或柳條編成的盛物器具。'],['圍笆','圍在周圍的防護竹籬。'],['築籬編笆','編織竹籬與防護柵欄。比喻建立防護措施或整理家園。']]},
+    {char:'笆',terms:[['笆斗','用竹子或柳條編成的盛物器具。'],['圍笆','圍在周圍的防護竹籬。'],['築籬編笆','編織竹籬與防護柵欄。比喻建立防護措施或整理家園。']]},
     {char:'寂',terms:[['寂靜','非常安靜、沒有聲音。'],['寂寞','孤單冷清、沒有依靠的感覺。'],['寂然','安靜無聲的樣子。'],['沉寂','聲音或活動完全平息下來。'],['寂遼','空曠而冷清。'],['萬籟俱寂','萬籟，自然界中的萬物發出的聲音。形容四周環境非常安靜，一點聲音也沒有。']]},
     {char:'陳',terms:[['陳列','擺設、排列出來供人觀看。'],['陳舊','過時、老舊的。'],['陳述','詳細地說明事理或經過。'],['新陳代謝','指生物體內舊物質不斷分解、新物質不斷生成的過程，也比喻事物不斷更新。'],['陳設','房間內擺設的家具與裝飾物。'],['推陳出新','除去舊的，創造出新的。比喻在舊有的基礎上創新、發展。']]}
   ]
@@ -52,20 +52,20 @@ const lessonL4 = {
   words: [
     {char:'衫',terms:[['襯衫','穿在裡面的單衣。'],['汗衫','吸汗的內衣。'],['衣衫','衣服的統稱。'],['長衫','傳統男子穿的長袍。'],['青衫','青色的衣服，舊時多為低階官員或讀書人所穿。'],['衣衫襤褸','藍縷，破爛的衣服。形容衣服極其破舊。']]},
     {char:'肌',terms:[['肌肉','人體與動物體內能收縮產生運動的組織。'],['肌膚','皮膚或體表。'],['心肌','構成心臟壁的肌肉。'],['肌理','皮膚的紋理，或指文章、藝術創作的結構脈絡。'],['胸肌','胸部兩側的肌肉。'],['冰肌玉骨','形容女子肌膚潔白晶瑩，氣質高潔。']]},
-    {char:'沸',terms:[['沸騰','液體達到沸點而翻滾發氣，比喻情緒極度高漲或場面熱烈。'],['沸點','液體沸騰時的溫度。'],['沸水','煮開的水。'],['人聲鼎沸','人群發出的聲音熱烈喧鬧，像水開了一樣。'],['熱血沸騰','形容激動得情緒高漲。'],['人聲鼎沸(成語)','鼎沸，水開了翻滾的樣子。形容人群的喧鬧聲極大，場面非常熱鬧。']]},
-    {char:'騰',terms:[['飛騰','飛翔升騰。'],['奔騰','快速奔跑或洶湧奔流。'],['騰空','升入空中，或清空空間。'],['沸騰','熱氣翻滾，或情緒高漲。'],['歡騰','熱烈高興的場面。'],['萬馬奔騰','無數匹馬共同奔跑。形容氣勢浩大、雄偉壯觀。']]},
+    {char:'沸',terms:[['沸騰','液體達到沸點而翻滾發氣，比喻情緒極度高漲或場面熱烈。'],['沸點','液體沸騰時的溫度。'],['沸水','煮開的水。'],['人聲鼎沸','人群發出的聲音熱烈喧鬧，像水開了一樣。'],['熱血沸騰','形容激動得情緒高漲。']]},
+    {char:'騰',terms:[['飛騰','飛翔升騰。'],['奔騰','快速奔跑或洶湧奔流。'],['騰空','升入空中，或清空空間。'],['歡騰','熱烈高興的場面。'],['萬馬奔騰','無數匹馬共同奔跑。形容氣勢浩大、雄偉壯觀。']]},
     {char:'兀',terms:[['兀立','高高地直立著。'],['兀自','副詞，依然、還是、自顧自地。'],['突兀','突然、出乎意料，或指高聳出眾。'],['兀兀','勤奮不懈、專心致志的樣子。'],['孤兀','孤單高聳的樣子。'],['突兀森郁','形容山峰高聳凸出，樹木繁茂鬱鬱蔥蔥。']]},
     {char:'唯',terms:[['唯一','獨一無二，沒有其他的。'],['唯有','只有。'],['唯美','追求極致的美感與藝術價值。'],['唯恐','只怕、唯獨擔心。'],['唯唯諾諾','形容連連答應，不敢抗拒，態度順從。'],['唯妙唯肖','形容模仿得非常逼真、生動傳神。']]},
     {char:'勺',terms:[['勺子','舀取食物或液體的工具。'],['飯勺','用來舀飯的勺子。'],['湯勺','用來舀湯的大匙。'],['大勺','烹飪時使用的大型炒鍋或大舀匙。'],['後腦勺','人頭部後方的下半部分。'],['一勺之水','比喻微少的水量，引申為極微小或有限的事物。']]},
-    {char:'吶',terms:[['吶喊','大聲呼喊以助威氣或抒發情緒。'],['搖旗吶喊','比喻在旁為他人加油打氣或聲援。'],['吶吶','說話遲鈍不流利的樣子（通「訥」）。'],['吐吶','呼氣吸氣的養生功法。'],['吶聲','大聲呼叫的聲音。'],['搖旗吶喊(成語)','搖晃旗幟、大聲呼喊。比喻在旁為他人加油助威或聲援。']]},
+    {char:'吶',terms:[['吶喊','大聲呼喊以助威氣或抒發情緒。'],['搖旗吶喊','比喻在旁為他人加油打氣或聲援。'],['吶吶','說話遲鈍不流利的樣子（通「訥」）。'],['吐吶','呼氣吸氣的養生功法。'],['吶聲','大聲呼叫的聲音。']]},
     {char:'握',terms:[['握手','互相拉手以示友好或禮貌。'],['掌握','掌控、理解並能運用。'],['握力','手掌抓握東西的力量。'],['把握','抓住機會，或成功的勝算。'],['緊握','用力抓緊。'],['勝券在握','券，契約憑證。比喻非常有把握取得勝利。']]},
     {char:'抵',terms:[['抵達','到達目的地。'],['抵抗','抗拒、阻止敵人的進攻或疾病的侵襲。'],['抵押','用物品做擔保以借取財物。'],['抵銷','互相抵消、相抵。'],['抵擋','擋住、抵抗。'],['矢口抵賴','矢口，發誓開口；抵賴，否認。一口咬定，死不承認錯誤。']]},
     {char:'置',terms:[['位置','所在的地方或職務。'],['設置','設立、安裝。'],['處置','處理、處罰。'],['佈置','安排、陳列。'],['添置','購買增加。'],['置之不理','放在一旁不予理睬。形容態度冷漠或漠不關心。']]},
     {char:'頒',terms:[['頒發','授予獎狀、獎牌或證書。'],['頒布','公布命令、法律或條例。'],['頒獎','公開頒發獎勵給獲獎者。'],['頒行','頒布施行。'],['頒賜','賞賜、賜予。']]},
     {char:'屬',terms:[['親屬','有血緣或婚姻關係的人。'],['專屬','獨家擁有、特別屬於某一特定對象。'],['金屬','具有光澤、導電導熱良好的物質。'],['下屬','職務較低、受領導的部員。'],['屬意','傾心、中意，或是將意念集中在某人事物上。'],['屬望殷切','殷切，熱烈而切實。對某人寄予極大的厚望與期待。']]},
-    {char:'榮',terms:[['榮譽','良好的名譽與光榮。'],['榮幸','光榮而幸運。'],['繁榮','經濟昌盛、熱鬧發展。'],['欣欣向榮','草木生長茂盛，或比喻事業蓬勃發展。'],['榮耀','光彩與榮譽。'],['欣欣向榮(成語)','形容草木茂盛，充滿生機。也比喻事業蓬勃發展、繁榮昌盛。']]},
+    {char:'榮',terms:[['榮譽','良好的名譽與光榮。'],['榮幸','光榮而幸運。'],['繁榮','經濟昌盛、熱鬧發展。'],['欣欣向榮','草木生長茂盛，或比喻事業蓬勃發展。'],['榮耀','光彩與榮譽。']]},
     {char:'搞',terms:[['搞定','順利完成、處理好。'],['搞錯','弄錯、理解錯誤。'],['搞鬼','暗中耍手段、作祟。'],['搞笑','幽默風趣、逗人發笑。'],['搞通','弄懂、明白道理。'],['搞鬼搞怪','暗中玩弄花樣、耍小聰明或搗亂。']]},
-    {char:'襯',terms:[['襯衫','穿在裡面的單衣。'],['襯託','用背景或對立事物來凸顯主體。'],['襯裙','穿在裙子內部的襯衣。'],['墊襯','在下方或內部加上墊物。'],['反襯','修辭手法，用相反的事物來凸顯本體。'],['相映成襯','互相映照、烘托，使雙方的主體更加突出美麗。']]},
+    {char:'襯',terms:[['襯託','用背景或對立事物來凸顯主體。'],['襯裙','穿在裙子內部的襯衣。'],['墊襯','在下方或內部加上墊物。'],['反襯','修辭手法，用相反的事物來凸顯本體。'],['相映成襯','互相映照、烘托，使雙方的主體更加突出美麗。']]},
     {char:'惹',terms:[['惹事','招惹是非、引起麻煩。'],['惹人喜愛','引起大家的喜愛與歡心。'],['招惹','引誘、觸怒他人。'],['惹禍','招來禍患。'],['惹眼','引人注目、顯眼。'],['惹是生非','招惹是非，引起麻煩或糾紛。']]},
     {char:'摟',terms:[['摟抱','雙臂合抱。'],['摟肩','用手臂搭在他人肩上。'],['摟腰','用手臂抱住腰部。'],['摟錢','聚攏、搜刮錢財。'],['摟袖子','挽起袖子準備動手做某事。'],['摟肩抱背','相互擁抱、搭肩，形容關係極其親密。']]},
     {char:'黝',terms:[['黝黑','微青黑色。'],['黝暗','黑暗。']]}
@@ -189,6 +189,11 @@ onValue(roomRef, snapshot => {
   document.querySelectorAll('.cloud-status').forEach(el => el.textContent = '● Firebase 連線失敗，使用本機暫存');
 });
 
+// Sync server time offset for accurate timer comparison between machines
+onValue(ref(database, '.info/serverTimeOffset'), snapshot => {
+  window._serverTimeDelta = +(snapshot.val() || 0);
+});
+
 function shuffle(a) { return [...a].sort(() => Math.random() - .5); }
 function seconds(s) {
   if (!s || s < 0) return '--:--';
@@ -198,6 +203,12 @@ function seconds(s) {
 function isGroupOnline(presence, groupId) {
   if (!presence) return false;
   const ts = presence[groupId] ?? presence[String(groupId)] ?? 0;
+  return typeof ts === 'number' && (Date.now() - ts < 25000);
+}
+
+function isGroupOccupied(occupancy, groupId) {
+  if (!occupancy) return false;
+  const ts = occupancy[groupId] ?? occupancy[String(groupId)] ?? 0;
   return typeof ts === 'number' && (Date.now() - ts < 25000);
 }
 
@@ -704,7 +715,7 @@ function teacherApp() {
     s.duration = +(timeSelect ? timeSelect.value : 60);
     s.groupCount = +(groupCountSelect ? groupCountSelect.value : 7);
     s.command = 'playing';
-    s.endsAt = Date.now() + s.duration * 1000;
+    s.endsAt = Date.now() + (window._serverTimeDelta || 0) + s.duration * 1000;
     s.answers = {};
     write(s);
   };
@@ -739,8 +750,16 @@ function teacherApp() {
     document.querySelector('#presence').innerHTML = Array.from({ length: totalGroups }, (_, i) => {
       const id = i + 1;
       const on = isGroupOnline(s.presence, id);
-      return `<span class="presence-chip ${on ? 'online' : ''}" data-group="${id}">第 ${id} 組 ${on ? '🟢 已連線' : '⚪ 未連線'}</span>`;
+      return `<span class="presence-chip ${on ? 'online' : ''}" data-group="${id}">第 ${id} 組 ${on ? '🟢 已連線' : '⚪ 未連線'}${on ? ` <button class="kick-btn" data-group="${id}" title="老師移除此組連線">✕</button>` : ''}</span>`;
     }).join('');
+    document.querySelectorAll('.kick-btn').forEach(btn => {
+      btn.onclick = e => {
+        e.stopPropagation();
+        const gid = btn.dataset.group;
+        remove(ref(database, `vocab_rooms/room603/state/presence/${gid}`)).catch(() => {});
+        remove(ref(database, `vocab_rooms/room603/state/groupOccupancy/${gid}`)).catch(() => {});
+      };
+    });
 
     const results = Object.values(s.answers || {});
     const errors = {};
@@ -973,13 +992,174 @@ function teacherApp() {
     populateLessons();
     populateWords();
     render();
+    populateEditorLessons();
   });
   setInterval(render, 500);
   render();
+
+  // ==================== TAB 3: 詞庫手動編輯器 ====================
+  const tabEditorMode = document.querySelector('#tabEditorMode');
+  const sectionEditorMode = document.querySelector('#sectionEditorMode');
+
+  if (tabEditorMode && sectionEditorMode) {
+    const allTabBtns = [tabSyncMode, tabSelfMode, tabEditorMode];
+    const allSections = [sectionSyncMode, sectionSelfMode, sectionEditorMode];
+    function switchTab(activeIdx) {
+      allTabBtns.forEach((btn, i) => {
+        if (!btn) return;
+        const isActive = i === activeIdx;
+        btn.classList.toggle('active', isActive);
+        btn.style.background = isActive ? 'var(--card)' : 'transparent';
+        btn.style.color = isActive ? 'var(--ink)' : 'var(--muted)';
+      });
+      allSections.forEach((sec, i) => {
+        if (!sec) return;
+        sec.style.display = i === activeIdx ? 'block' : 'none';
+      });
+    }
+    tabSyncMode.onclick = () => switchTab(0);
+    tabSelfMode.onclick = () => switchTab(1);
+    tabEditorMode.onclick = () => { switchTab(2); populateEditorLessons(); };
+  }
+
+  let editorCurrentLessonId = null;
+  let editorCurrentCharIndex = null;
+  let editorEditingLesson = null;
+
+  const editorLessonSelect = document.querySelector('#editorLessonSelect');
+  const editorCharList = document.querySelector('#editorCharList');
+  const editorTermSection = document.querySelector('#editorTermSection');
+  const editorCharTitle = document.querySelector('#editorCharTitle');
+  const editorTermCount = document.querySelector('#editorTermCount');
+  const editorTermList = document.querySelector('#editorTermList');
+  const editorSaveBtn = document.querySelector('#editorSaveBtn');
+  const editorNewTerm = document.querySelector('#editorNewTerm');
+  const editorNewMeaning = document.querySelector('#editorNewMeaning');
+  const editorAddTermBtn = document.querySelector('#editorAddTermBtn');
+
+  function populateEditorLessons() {
+    if (!editorLessonSelect) return;
+    const s = read();
+    const lessons = getAllLessons(s);
+    const currentVal = editorLessonSelect.value || editorCurrentLessonId;
+    editorLessonSelect.innerHTML = lessons.map(l => `<option value="${l.id}">${l.title} (${l.words ? l.words.length : 0}字)</option>`).join('');
+    if (currentVal && lessons.some(l => l.id === currentVal)) {
+      editorLessonSelect.value = currentVal;
+      editorCurrentLessonId = currentVal;
+    } else if (lessons.length) {
+      editorCurrentLessonId = lessons[0].id;
+      editorLessonSelect.value = editorCurrentLessonId;
+    }
+    renderEditorCharList();
+  }
+
+  function renderEditorCharList() {
+    if (!editorCharList) return;
+    const s = read();
+    const lessons = getAllLessons(s);
+    const lesson = lessons.find(l => l.id === editorCurrentLessonId) || lessons[0];
+    if (!lesson) return;
+    editorEditingLesson = JSON.parse(JSON.stringify(lesson));
+    editorCharList.innerHTML = (lesson.words || []).map((w, i) =>
+      `<button class="word-chip ${editorCurrentCharIndex === i ? 'active' : ''}" data-char-index="${i}" style="cursor:pointer;padding:10px 18px;font-size:18px;font-weight:900;">${w.char}</button>`
+    ).join('');
+    editorCharList.querySelectorAll('[data-char-index]').forEach(btn => {
+      btn.onclick = () => {
+        editorCurrentCharIndex = +btn.dataset.charIndex;
+        renderEditorCharList();
+        renderEditorTerms();
+      };
+    });
+    if (editorCurrentCharIndex !== null && editorCurrentCharIndex < (lesson.words || []).length) {
+      renderEditorTerms();
+    } else if (editorTermSection) {
+      editorTermSection.style.display = 'none';
+    }
+  }
+
+  function renderEditorTerms() {
+    if (!editorTermSection || editorCurrentCharIndex === null || !editorEditingLesson) return;
+    const word = editorEditingLesson.words[editorCurrentCharIndex];
+    if (!word) return;
+    editorTermSection.style.display = 'block';
+    if (editorCharTitle) editorCharTitle.textContent = `【${word.char}】字的語詞配對`;
+    if (editorTermCount) editorTermCount.textContent = `目前共 ${word.terms.length} 個語詞配對`;
+    if (!editorTermList) return;
+    editorTermList.innerHTML = (word.terms || []).map((pair, idx) => `
+      <div class="editor-term-row" data-term-idx="${idx}">
+        <span class="editor-row-num">${idx + 1}</span>
+        <input class="editor-term-input editor-input" type="text" value="${pair[0].replaceAll('"', '&quot;')}" data-idx="${idx}" data-field="0" placeholder="語詞名稱">
+        <input class="editor-meaning-input editor-input" type="text" value="${pair[1].replaceAll('"', '&quot;')}" data-idx="${idx}" data-field="1" placeholder="詞義解釋">
+        <button class="editor-del-btn" data-idx="${idx}" title="刪除此語詞">🗑</button>
+      </div>
+    `).join('');
+    editorTermList.querySelectorAll('.editor-term-input, .editor-meaning-input').forEach(inp => {
+      inp.oninput = () => {
+        const idx = +inp.dataset.idx;
+        const field = +inp.dataset.field;
+        if (editorEditingLesson.words[editorCurrentCharIndex]) {
+          editorEditingLesson.words[editorCurrentCharIndex].terms[idx][field] = inp.value;
+        }
+      };
+    });
+    editorTermList.querySelectorAll('.editor-del-btn').forEach(btn => {
+      btn.onclick = () => {
+        const idx = +btn.dataset.idx;
+        editorEditingLesson.words[editorCurrentCharIndex].terms.splice(idx, 1);
+        renderEditorTerms();
+      };
+    });
+  }
+
+  if (editorLessonSelect) {
+    editorLessonSelect.onchange = () => {
+      editorCurrentLessonId = editorLessonSelect.value;
+      editorCurrentCharIndex = null;
+      if (editorTermSection) editorTermSection.style.display = 'none';
+      renderEditorCharList();
+    };
+  }
+
+  if (editorAddTermBtn) {
+    editorAddTermBtn.onclick = () => {
+      if (!editorEditingLesson || editorCurrentCharIndex === null) { alert('請先選擇要編輯的生字'); return; }
+      const term = editorNewTerm?.value.trim();
+      const meaning = editorNewMeaning?.value.trim();
+      if (!term || !meaning) { alert('請填入語詞名稱與詞義解釋'); return; }
+      editorEditingLesson.words[editorCurrentCharIndex].terms.push([term, meaning]);
+      if (editorNewTerm) editorNewTerm.value = '';
+      if (editorNewMeaning) editorNewMeaning.value = '';
+      renderEditorTerms();
+    };
+  }
+
+  if (editorSaveBtn) {
+    editorSaveBtn.onclick = () => {
+      if (!editorEditingLesson) { alert('請先選擇生字'); return; }
+      const currentLessons = getStoredLessons();
+      currentLessons[editorEditingLesson.id] = editorEditingLesson;
+      saveStoredLessons(currentLessons);
+      const s = read();
+      s.lessons = s.lessons || {};
+      s.lessons[editorEditingLesson.id] = editorEditingLesson;
+      write(s);
+      const lessonRef = ref(database, `vocab_rooms/room603/state/lessons/${editorEditingLesson.id}`);
+      set(lessonRef, editorEditingLesson).then(() => {
+        alert(`✅ 已成功儲存【${editorEditingLesson.title}】語詞修改！`);
+      }).catch(err => {
+        console.error(err);
+        alert('儲存失敗，請確認網路連線。');
+      });
+      populateLessons();
+      populateWords();
+    };
+  }
+
+  populateEditorLessons();
 }
 
 function studentApp() {
-  let group = +localStorage.getItem('vocab-group') || 0, selected = null, termOrder = [];
+  let group = 0, selected = null, termOrder = [];
   let lastCommand = 'waiting';
   let celebratedWord = '';
 
@@ -991,21 +1171,21 @@ function studentApp() {
     const totalGroups = s.groupCount || 7;
     const choicesEl = document.querySelector('#groupChoices');
     if (!choicesEl) return;
-    const html = Array.from({ length: totalGroups }, (_, i) =>
-      `<button class="group-choice ${group === i + 1 ? 'selected' : ''}" value="${i + 1}">第 ${i + 1} 組</button>`
-    ).join('');
-    if (choicesEl.innerHTML !== html) {
-      choicesEl.innerHTML = html;
-      choicesEl.querySelectorAll('.group-choice').forEach(b => {
-        b.onclick = () => {
-          group = +b.value;
-          localStorage.setItem('vocab-group', group);
-          if (dialog.open) dialog.close();
-          presence();
-          render();
-        };
-      });
-    }
+    const occupancy = s.groupOccupancy || {};
+    choicesEl.innerHTML = Array.from({ length: totalGroups }, (_, i) => {
+      const id = i + 1;
+      const isMyGroup = group === id;
+      const occupied = isGroupOccupied(occupancy, id) && !isMyGroup;
+      return `<button class="group-choice ${isMyGroup ? 'selected' : ''} ${occupied ? 'occupied' : ''}" value="${id}" ${occupied ? 'disabled' : ''}>${occupied ? '🔒 ' : ''}第 ${id} 組${occupied ? '<br><small style="font-size:11px;font-weight:600;">已被佔用</small>' : ''}</button>`;
+    }).join('');
+    choicesEl.querySelectorAll('.group-choice:not([disabled])').forEach(b => {
+      b.onclick = () => {
+        group = +b.value;
+        if (dialog.open) dialog.close();
+        presence();
+        render();
+      };
+    });
   }
 
   renderGroupChoices();
@@ -1024,13 +1204,15 @@ function studentApp() {
   function presence() {
     if (!group) return;
     const pRef = ref(database, `vocab_rooms/room603/state/presence/${group}`);
+    const occRef = ref(database, `vocab_rooms/room603/state/groupOccupancy/${group}`);
     set(pRef, Date.now()).catch(() => {});
+    set(occRef, Date.now()).catch(() => {});
   }
   setInterval(presence, 3000);
   presence();
 
   function render() {
-    const s = read(), w = activeWord(s), playing = s.command === 'playing' && Date.now() < (s.endsAt || 0);
+    const s = read(), w = activeWord(s), serverNow = Date.now() + (window._serverTimeDelta || 0), playing = s.command === 'playing' && !!s.endsAt && serverNow < s.endsAt;
     const activeLesson = getActiveLesson(s);
     const words = activeLesson.words || [];
 
@@ -1049,7 +1231,7 @@ function studentApp() {
 
     document.querySelector('#wordChips').innerHTML = words.map((x, i) => `<span class="word-chip ${i === s.wordIndex ? 'active' : ''}">${x.char}</span>`).join('');
     document.querySelector('#charBadge').textContent = w ? w.char : '?';
-    document.querySelector('#studentTimer').textContent = seconds(playing ? (s.endsAt - Date.now()) / 1000 : null);
+    document.querySelector('#studentTimer').textContent = seconds(playing ? (s.endsAt - serverNow) / 1000 : null);
     document.querySelector('#taskPanel').classList.toggle('locked', !playing);
     document.querySelector('#taskTitle').textContent = playing ? `【第 ${group} 組】生字【${w ? w.char : '?'}】配對任務` : (s.command === 'stopped' ? '本輪作答已結束（鎖定中）' : '已連線報到，等待老師發布任務');
     document.querySelector('#taskHint').textContent = playing ? '老師發布開始後即可作答！連線結果同步至大螢幕。' : '請先選擇組別，並留意教師大螢幕指令。';

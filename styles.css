@@ -558,3 +558,92 @@ dialog form {
   .matching-grid { grid-template-columns: 1fr; gap: 14px; }
   .task-title { flex-wrap: wrap; }
 }
+
+/* Occupied group button (student group selection dialog) */
+.group-choice.occupied {
+  border-color: #7f1d1d;
+  background: #1a0a0a;
+  color: #6b7280;
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+.group-choice.occupied:hover {
+  transform: none;
+  border-color: #7f1d1d;
+}
+
+/* Kick button inside presence chip (teacher view) */
+.kick-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #ef4444;
+  border: none;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+  margin-left: 6px;
+  vertical-align: middle;
+  transition: background 0.15s;
+  line-height: 1;
+}
+.kick-btn:hover { background: #dc2626; }
+
+/* Vocab editor term row */
+.editor-term-row {
+  display: grid;
+  grid-template-columns: 28px 1fr 2fr 40px;
+  gap: 8px;
+  align-items: center;
+  background: #1e293b;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+}
+.editor-row-num {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 800;
+  text-align: center;
+}
+.editor-input {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+  width: 100%;
+}
+.editor-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.25);
+}
+.editor-del-btn {
+  background: transparent;
+  border: 1px solid #7f1d1d;
+  border-radius: 8px;
+  color: #f87171;
+  font-size: 14px;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: 0.15s;
+}
+.editor-del-btn:hover { background: #7f1d1d; color: #fff; }
+
+/* Review toolbar layout */
+.review-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
