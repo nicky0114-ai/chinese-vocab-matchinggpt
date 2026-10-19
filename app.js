@@ -72,10 +72,64 @@ const lessonL4 = {
   ]
 };
 
+const lessonL5 = {
+  id: 'l5',
+  title: '六年級國語 L5',
+  words: [
+    {char:'載',terms:[['載運','用車船等交通工具運送。'],['承載','承受負載。'],['刊載','在報刊雜誌等出版品上登載。'],['載歌載舞','一邊唱歌，一邊跳舞，形容盡情歡樂。'],['千載難逢','千年也難以碰到一次，形容機會極其難得。'],['滿載而歸','裝得滿滿的歸來。比喻收穫豐碩，成果豐沛。']]},
+    {char:'益',terms:[['利益','好處。'],['有益','有幫助、有好處。'],['收益','獲得的利益或收穫。'],['良師益友','能給予良好教導與幫助的師長和朋友。'],['精益求精','比喻已經很好了，還要追求更加完美。']]},
+    {char:'副',terms:[['副本','正式文件的抄本或影印本。'],['副手','輔助主要負責人工作的人。'],['副業','主要工作之外兼營的事業。'],['副作用','伴隨主要作用而產生的不良反應。'],['名副其實','名聲或名稱與實際情況完全相符。']]},
+    {char:'監',terms:[['監督','監察並督導。'],['監考','在考場監察考生作答。'],['監獄','拘留、關押犯罪者的場所。'],['監理','監督管理。'],['太監','古代宮廷中侍奉皇帝及皇族的宦官。'],['監守自盜','竊取公務或業務上自己所主管保護的財物。']]},
+    {char:'噪',terms:[['噪音','吵鬧刺耳的聲音。'],['噪聲','繁雜紛亂的聲響。'],['聒噪','說話聲音雜亂刺耳。'],['鼓噪','大聲喧嚷以助聲勢。'],['名噪一時','名聲在某個時期內極為響亮，廣為人知。']]},
+    {char:'避',terms:[['避難','逃避災難或危險。'],['迴避','設法避開、躲避。'],['逃避','不敢面對而躲避。'],['躲避','隱蔽起來以防被發現或遭受危險。'],['避重就輕','避開艱難或主要的問題，只處理輕鬆或次要的部分。']]},
+    {char:'迅',terms:[['迅速','非常快速。'],['迅捷','動作敏捷迅速。'],['迅猛','速度快且氣勢猛烈。'],['迅疾','迅速快捷。'],['迅雷不及掩耳','雷聲來得極快，連掩住耳朵都來不及。比喻事發突然迅速，使人防備不及。']]},
+    {char:'滅',terms:[['消滅','消除除去，使其不存在。'],['滅火','撲滅火災。'],['熄滅','火焰或燈火停止燃燒。'],['毀滅','徹底破壞消滅。'],['自生自滅','自然產生，自然消滅。比喻不予理會，放任其自行發展或毀滅。']]},
+    {char:'援',terms:[['救援','救助處於險境的人。'],['援助','給予支援和幫助。'],['馳援','奔馳前往救助。'],['援引','引用法令、事例或前例。'],['孤立無援','單獨一人或一方，得不到任何支援與幫助。']]},
+    {char:'燒',terms:[['燃燒','物體起火發光發熱。'],['發燒','體溫高於正常範圍。'],['燒烤','將食物放在火上炙烤。'],['燒毀','被火焚毀。'],['火燒眉毛','火燒到了眉毛。比喻形勢極其緊迫危急。']]},
+    {char:'液',terms:[['液體','有流動性、體積固定但形狀隨容器改變的物質。'],['血液','在人體血管內流動的紅色液體。'],['溶液','溶質分散於溶劑中形成的均勻混合物。'],['體液','人體或動物體內的液體總稱。'],['金漿玉液','原指神仙的飲料，後比喻極為甘美珍貴的漿液或佳釀。']]},
+    {char:'蝕',terms:[['侵蝕','逐漸侵害、削弱。'],['腐蝕','受酸鹼等化學物質作用而受損破壞。'],['日蝕','月球運行到太陽與地球之間遮蔽陽光的現象。'],['風蝕','岩石受風沙吹拂吹刮而逐漸磨損的現象。'],['蠶食鯨吞','比喻用各種手段逐漸侵占或大規模吞併。']]},
+    {char:'觸',terms:[['接觸','挨上、碰著，或發生交際往來。'],['觸摸','用手撫摸、碰觸。'],['觸動','碰動，或指因受刺激而引發某種思緒情感。'],['觸角','昆蟲等頭部的感覺器官，也比喻探尋的途徑。'],['觸類旁通','理解了某一事物的道理，進而推知其他同類事物的道理。']]},
+    {char:'承',terms:[['承擔','負起責任或工作。'],['承認','表示認可、同意事實。'],['承受','接受、經受考驗或重擔。'],['繼承','接受前人的財產、事業或傳統。'],['承先啟後','繼承前人的事業，並為後人開闢未來的道路。']]},
+    {char:'陌',terms:[['陌生','生疏、不熟悉。'],['陌生人','不相識的人。'],['陌路','不相識的人，或比喻關係疏遠。'],['阡陌','田間交錯的小路。'],['視同陌路','看作路上不相識的人。比喻關係冷淡，不再親近往來。']]},
+    {char:'攝',terms:[['攝影','使用相機記錄影像。'],['攝取','吸收、吸納（如：攝取營養）。'],['攝政','代理君主掌管國政。'],['拍攝','用攝影機或相機拍下畫面。'],['勾魂攝魄','形容事物極具魅力與吸引力，令人心神迷醉。']]},
+    {char:'檔',terms:[['檔案','分類保存備查的文件圖表等資料。'],['檔期','戲劇、電影或展覽上映展出的期間。'],['搭檔','合作的夥伴，或指一同工作。'],['空檔','事情銜接間的空閒時間。'],['最佳拍檔','形容配合得最默契、合作成效最好的夥伴。']]},
+    {char:'撈',terms:[['打撈','從水底或液體中撈取東西。'],['撈取','撈出取回，或指藉機謀取利益。'],['捕撈','捕抓打撈水產。'],['撈油水','利用職務之便獲取不正當的好處。'],['撈什子','指惹人討厭或繁瑣無用的事物。'],['大海撈針','在大海中撈取一根針。比喻極難找到或極難實現的事情。']]},
+    {char:'註',terms:[['附註','在文章或表冊末尾附加的說明文字。'],['註冊','登記立案，取得資格。'],['備註','供參考說明的文字或欄位。'],['註解','解釋字句含義的文字。'],['命中註定','指命運由天意預先注定。也比喻事物的發展與結果是必然的。']]}
+  ]
+};
+
+const lessonL6 = {
+  id: 'l6',
+  title: '六年級國語 L6',
+  words: [
+    {char:'艇',terms:[['快艇','速度很快的小型汽艇。'],['潛水艇','能在水下潛航的軍用或科研船艦。'],['遊艇','用於休閒、觀光或水上娛樂的中小型船隻。'],['艦艇','軍用船艦與巡邏艇的統稱。'],['賽艇','體育划船競賽所使用的專用輕型舟艇。'],['中流孤艇','在急流中的孤單小船。比喻處境孤立險惡，面臨嚴峻挑戰。']]},
+    {char:'劃',terms:[['劃分','分割區別。'],['籌劃','籌謀規劃。'],['策劃','謀劃策定方案。'],['劃破','用刀或尖銳物在物體表面割開口子。'],['整齊劃一','形容非常有秩序、有條理。'],['劃時代','開創新時代。形容對歷史或某一領域產生極其重大且深遠的影響。']]},
+    {char:'荒',terms:[['荒涼','荒蕪冷落、人煙稀少。'],['荒廢','因廢棄或怠惰而未加利用經營。'],['荒謬','極端荒唐且不合情理。'],['荒野','未經開發的荒涼原野。'],['破天荒','形容從來沒有過的事，或第一次出現的事。'],['天荒地老','歷經極長的時間。比喻時間長久或感情堅貞不渝、永恆不變。']]},
+    {char:'垠',terms:[['無垠','沒有邊界，極為遼闊廣大。'],['浩瀚無垠','廣大繁多，無邊無際。'],['垠涯','邊際、極限。'],['一望無垠','一眼望去看不見邊際。形容極為廣大遼闊。']]},
+    {char:'宇',terms:[['屋宇','房屋建築。'],['氣宇','人的胸襟與風度氣質。'],['器宇不凡','風度氣概與眾不同，非同凡響。'],['宇內','天下、四海之內。'],['氣宇軒昂','形容人神采奕奕，氣度豪邁，儀表非凡。']]},
+    {char:'宙',terms:[['宇宙','天地萬物存在的時間與空間總和。'],['世宙','人世間的時間跨度或世代。'],['宙始','宇宙萬物的開端。'],['眼空宇宙','眼睛裡容不下整個宇宙。形容自視甚高，目空一切，自負高傲。']]},
+    {char:'朽',terms:[['腐朽','腐爛敗壞，也比喻思想陳舊陳腐。'],['不朽','永不磨滅，流傳久遠。'],['朽木','腐爛的木頭，比喻不可造就之人。'],['殘朽','殘破腐朽的事物。'],['永垂不朽','光輝的事蹟或崇高的精神永遠流傳，永不磨滅。']]},
+    {char:'誌',terms:[['雜誌','定期出版發行的刊物。'],['標誌','表明特徵的符號或記號。'],['墓誌','刻在石碑上記述死者生平的文字。'],['日誌','每日記錄工作、活動或生活的手冊。'],['永誌不忘','永遠記在心裡，永不忘懷。']]},
+    {char:'系',terms:[['系統','依一定順序、規則組成的整體結構。'],['系列','一連串成套的事物或作品。'],['品系','動植物中具特定遺傳特徵的分類群體。'],['太陽系','以太陽為中心的天體運行系統。']]},
+    {char:'訓',terms:[['訓練','有計畫地操練與培養技能。'],['教訓','指點告誡，或指從錯誤中學到的經驗。'],['訓示','上級對下級的教導指示。'],['家訓','長輩留給子孫為人處世的訓誡格言。'],['不足為訓','訓，準則、法則。不能作為效法學習的範例或準則。']]},
+    {char:'械',terms:[['機械','能轉換能量以代替人力運作的裝置結構。'],['器械','器具、設備，多指專業用具。'],['械鬥','聚眾持武器爭鬥。'],['軍械','軍事作戰所使用的武器與裝備。'],['束手繳械','繳出武器，雙手束縛。比喻完全放棄反抗，徹底投降。']]},
+    {char:'艙',terms:[['船艙','船隻內部的空間隔間。'],['機艙','飛機內部供人員搭乘或放置機具的空間。'],['客艙','交通工具中專門提供乘客乘坐的艙室。'],['貨艙','船隻或飛機中專門堆放貨物的隔間。'],['滿艙而歸','船艙裝得滿滿的歸航。比喻收穫豐富、成果極為豐碩。']]},
+    {char:'駕',terms:[['駕駛','操縱把控交通工具的行進。'],['駕馭','驅使車馬，引申為掌控、支配。'],['勞駕','客套話，麻煩他人之辭。'],['駕照','駕駛交通工具的許可證照。'],['駕輕就熟','比喻對事情很熟悉，做起來很輕鬆。'],['並駕齊驅','並排行駛，速度相等。比喻彼此實力相當，不分高下。']]},
+    {char:'凌',terms:[['凌空','升上高空，高懸在空中。'],['凌霄','直上雲霄，形容極高。'],['凌厲','氣勢猛烈逼人。'],['欺凌','以強欺弱，仗勢欺壓。'],['壯志凌雲','志向高遠，直上雲霄。形容抱負極其遠大宏偉。']]},
+    {char:'隕',terms:[['隕石','從外太空墜落到地球表面的流星體殘餘物。'],['隕落','從高空墜落，也比喻偉人或傑出人才的逝世。'],['隕星','墜落的流星。'],['隕滅','毀滅、消亡。'],['星隕如雨','流星紛紛墜落，有如落雨一般。形容流星雨壯觀的景象。']]},
+    {char:'眺',terms:[['遠眺','向遠方看。'],['登高遠眺','爬到高處向遠方眺望。'],['眺望','從高處往遠處看。'],['俯眺','從高處往下看。'],['極目遠眺','用盡目力向遠方眺望。形容視野開闊廣大。']]},
+    {char:'奪',terms:[['奪冠','在比賽中奪得冠軍。'],['爭奪','互相爭搶競爭。'],['掠奪','以暴力搶奪財物。'],['剝奪','依法律或權力取消權益資格。'],['光彩奪目','色彩光芒極其耀眼奪目。'],['強詞奪理','形容沒有道理卻強為狡辯，硬說成有理。']]},
+    {char:'億',terms:[['億萬','形容數目極其龐大繁多。'],['數以億計','以億為單位來計算，數量極多。'],['億兆','形容極多極廣，泛指天下百姓。'],['億萬富翁','家財極其豐厚、擁有上億財富的人。'],['億萬斯年','斯，語助詞。形容年代悠遠長久，永世長存。']]},
+    {char:'征',terms:[['征戰','長途遠征作戰。'],['長征','長距離遠征旅行或軍事行動。'],['征途','遠行的路途，也比喻奮鬥的歷程。'],['出征','軍隊出發前往戰場作戰。'],['南征北討','向南征伐，向北討伐。形容經歷多次戰事，奔波征戰。']]}
+  ]
+};
+
 const defaultLessons = {
   [defaultLesson.id]: defaultLesson,
   [lessonL3.id]: lessonL3,
-  [lessonL4.id]: lessonL4
+  [lessonL4.id]: lessonL4,
+  [lessonL5.id]: lessonL5,
+  [lessonL6.id]: lessonL6
 };
 
 function getStoredLessons() {
@@ -97,6 +151,8 @@ function getStoredLessons() {
   result[defaultLesson.id] = defaultLesson;
   result[lessonL3.id] = lessonL3;
   result[lessonL4.id] = lessonL4;
+  result[lessonL5.id] = lessonL5;
+  result[lessonL6.id] = lessonL6;
   return result;
 }
 
@@ -110,7 +166,7 @@ function baseState() {
   return {
     command: 'waiting',
     groupCount: DEFAULT_GROUPS,
-    currentLessonId: 'l4',
+    currentLessonId: 'l5',
     wordIndex: 0,
     duration: 60,
     endsAt: null,
@@ -121,7 +177,7 @@ function baseState() {
       enabled: true,
       startTime: "08:00",
       endTime: "17:00",
-      allowedLessons: ["l4", "l3", "l2"]
+      allowedLessons: ["l6", "l5", "l4", "l3", "l2"]
     },
     selfPracticeRecords: {},
     updatedAt: Date.now()
@@ -152,7 +208,7 @@ function write(next) {
   runTransaction(roomRef, current => {
     const prior = current || baseState();
     const shouldClearAnswers = (next.command === 'waiting' || next.command === 'stopped' || (next.command === 'playing' && Object.keys(next.answers || {}).length === 0)) && Object.keys(next.answers || {}).length === 0;
-    const mergedLessons = { ...getStoredLessons(), ...(prior.lessons || {}), ...(next.lessons || {}), [defaultLesson.id]: defaultLesson, [lessonL3.id]: lessonL3, [lessonL4.id]: lessonL4 };
+    const mergedLessons = { ...getStoredLessons(), ...(prior.lessons || {}), ...(next.lessons || {}), [defaultLesson.id]: defaultLesson, [lessonL3.id]: lessonL3, [lessonL4.id]: lessonL4, [lessonL5.id]: lessonL5, [lessonL6.id]: lessonL6 };
     return {
       ...prior,
       ...next,
@@ -180,7 +236,7 @@ onValue(roomRef, snapshot => {
       validServer[item.id] = item;
     }
   });
-  const allLessons = { ...localLessons, ...validServer, [defaultLesson.id]: defaultLesson, [lessonL3.id]: lessonL3, [lessonL4.id]: lessonL4 };
+  const allLessons = { ...localLessons, ...validServer, [defaultLesson.id]: defaultLesson, [lessonL3.id]: lessonL3, [lessonL4.id]: lessonL4, [lessonL5.id]: lessonL5, [lessonL6.id]: lessonL6 };
   saveStoredLessons(allLessons);
   roomState = { ...baseState(), ...val, lessons: allLessons };
   notify();
@@ -228,16 +284,18 @@ function getAllLessons(state) {
   validMap[defaultLesson.id] = defaultLesson;
   validMap[lessonL3.id] = lessonL3;
   validMap[lessonL4.id] = lessonL4;
+  validMap[lessonL5.id] = lessonL5;
+  validMap[lessonL6.id] = lessonL6;
 
   const list = Object.values(validMap);
-  return list.length ? list : [defaultLesson, lessonL3, lessonL4];
+  return list.length ? list : [defaultLesson, lessonL3, lessonL4, lessonL5, lessonL6];
 }
 
 function getActiveLesson(state) {
   const s = state || read();
   const all = getAllLessons(s);
   const targetId = s?.currentLessonId;
-  return all.find(l => l.id === targetId) || all.find(l => l.id === 'l4') || all.find(l => l.id === 'l3') || all.find(l => l.id === 'l2') || all[0] || lessonL4;
+  return all.find(l => l.id === targetId) || all.find(l => l.id === 'l5') || all.find(l => l.id === 'l6') || all.find(l => l.id === 'l4') || all.find(l => l.id === 'l3') || all.find(l => l.id === 'l2') || all[0] || lessonL5;
 }
 
 function activeWord(state) {
@@ -859,7 +917,7 @@ function teacherApp() {
 
   function renderSelfPracticeConfigInputs() {
     const s = read();
-    const cfg = s.selfPracticeConfig || { enabled: true, startTime: '08:00', endTime: '17:00', allowedLessons: ['l4', 'l3', 'l2'] };
+    const cfg = s.selfPracticeConfig || { enabled: true, startTime: '08:00', endTime: '17:00', allowedLessons: ['l6', 'l5', 'l4', 'l3', 'l2'] };
     if (selfPracticeEnabled) selfPracticeEnabled.value = String(cfg.enabled !== false);
     if (selfPracticeStartTime && document.activeElement !== selfPracticeStartTime) selfPracticeStartTime.value = cfg.startTime || '08:00';
     if (selfPracticeEndTime && document.activeElement !== selfPracticeEndTime) selfPracticeEndTime.value = cfg.endTime || '17:00';
@@ -1373,7 +1431,7 @@ function studentApp() {
 
 function practiceApp() {
   let profile = JSON.parse(localStorage.getItem('vocab-self-profile')) || null;
-  let activeLessonId = 'l4';
+  let activeLessonId = 'l5';
   let activeWordIndex = 0;
   let selected = null;
   let termOrder = [];
@@ -1445,7 +1503,7 @@ function practiceApp() {
 
   function render() {
     const s = read();
-    const cfg = s.selfPracticeConfig || { enabled: true, startTime: '08:00', endTime: '17:00', allowedLessons: ['l4', 'l3', 'l2'] };
+    const cfg = s.selfPracticeConfig || { enabled: true, startTime: '08:00', endTime: '17:00', allowedLessons: ['l6', 'l5', 'l4', 'l3', 'l2'] };
 
     const timeStatusEl = document.querySelector('#timeWindowStatus');
     const now = new Date();
