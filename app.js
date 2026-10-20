@@ -9,17 +9,6 @@ const database = getDatabase(firebaseApp);
 const roomRef = ref(database, 'vocab_rooms/room603/state');
 const DEFAULT_GROUPS = 7;
 
-const defaultLesson = {
-  id: 'l2',
-  title: '六年級國語 L2',
-  words: [
-    {char:'裁',terms:[['裁縫','裁剪並縫製衣服，或指從事這種工作的人。'],['裁員','因業務縮減而減少工作人員。'],['裁判','體育比賽中負責評判勝負的司法人員。'],['體裁','詩歌、散文、小說等文章的寫作樣式或結構。'],['獨裁','獨自掌握政治權力，實行專制統治。'],['獨出心裁','比喻構思獨特，與眾不同。']]},
-    {char:'茂',terms:[['茂盛','植物生長繁茂。'],['豐茂','形容土地肥沃，草木生長旺盛。'],['根深葉茂','植物根基深、枝葉茂密。'],['聲情並茂','演唱、朗誦或演說時聲音和感情生動感人。'],['圖文並茂','書籍、報告或海報中圖畫與文字都很豐富精采。']]},
-    {char:'藤',terms:[['藤蔓','藤本植物攀爬蔓延的細莖。'],['藤椅','用藤條編織成的椅子，通風涼快。'],['紫藤','春季開紫藍色花的蔓生植物。'],['蔓藤','植物細長且攀附他物的莖。'],['順藤摸瓜','比喻沿著線索追根究底，查明事實真相。']]},
-    {char:'免',terms:[['避免','防止、設法使不發生。'],['免稅','免除應繳納的稅金。'],['免除','省去、撤除。'],['免費','不收取費用。'],['在所難免','無論如何很難免除、避免。']]}
-  ]
-};
-
 const lessonL3 = {
   id: 'l3',
   title: '六年級國語 L3',
@@ -124,13 +113,16 @@ const lessonL6 = {
   ]
 };
 
+const defaultLesson = lessonL3;
+
 const defaultLessons = {
-  [defaultLesson.id]: defaultLesson,
   [lessonL3.id]: lessonL3,
   [lessonL4.id]: lessonL4,
   [lessonL5.id]: lessonL5,
   [lessonL6.id]: lessonL6
 };
+
+const IGNORED_LESSON_IDS = new Set(['l2', 'lesson_1790952296280', 'lesson_1792418522445']);
 
 function getStoredLessons() {
   const result = {};
@@ -142,13 +134,14 @@ function getStoredLessons() {
         const items = Array.isArray(custom) ? custom : Object.values(custom);
         items.forEach(item => {
           if (item && item.id && item.title && Array.isArray(item.words) && item.words.length > 0) {
+            if (IGNORED_LESSON_IDS.has(item.id)) return;
+            if (item.id.startsWith('lesson_') && item.words.length < 5) return;
             result[item.id] = item;
           }
         });
       }
     }
   } catch (e) {}
-  result[defaultLesson.id] = defaultLesson;
   result[lessonL3.id] = lessonL3;
   result[lessonL4.id] = lessonL4;
   result[lessonL5.id] = lessonL5;
@@ -177,7 +170,7 @@ function baseState() {
       enabled: true,
       startTime: "08:00",
       endTime: "17:00",
-      allowedLessons: ["l6", "l5", "l4", "l3", "l2"]
+      allowedLessons: ["l6", "l5", "l4", "l3"]
     },
     selfPracticeRecords: {},
     updatedAt: Date.now()
@@ -208,7 +201,8 @@ function write(next) {
   runTransaction(roomRef, current => {
     const prior = current || baseState();
     const shouldClearAnswers = (next.command === 'waiting' || next.command === 'stopped' || (next.command === 'playing' && Object.keys(next.answers || {}).length === 0)) && Object.keys(next.answers || {}).length === 0;
-    const mergedLessons = { ...getStoredLessons(), ...(prior.lessons || {}), ...(next.lessons || {}), [defaultLesson.id]: defaultLesson, [lessonL3.id]: lessonL3, [lessonL4.id]: lessonL4, [lessonL5.id]: lessonL5, [lessonL6.id]: lessonL6 };
+    const mergedLessons = { ...getStoredLessons(), ...(prior.lessons || {}), ...(next.lessons || {}), [lessonL3.id]: lessonL3, [lessonL4.id]: lessonL4, [lessonL5.id]: lessonL5, [lessonL6.id]: lessonL6 };
+    IGNORED_LESSON_IDS.forEach(id => delete mergedLessons[id]);
     return {
       ...prior,
       ...next,
@@ -233,10 +227,13 @@ onValue(roomRef, snapshot => {
   const serverItems = Array.isArray(serverLessons) ? serverLessons : Object.values(serverLessons);
   serverItems.forEach(item => {
     if (item && item.id && item.title && Array.isArray(item.words) && item.words.length > 0) {
+      if (IGNORED_LESSON_IDS.has(item.id)) return;
+      if (item.id.startsWith('lesson_') && item.words.length < 5) return;
       validServer[item.id] = item;
     }
   });
-  const allLessons = { ...localLessons, ...validServer, [defaultLesson.id]: defaultLesson, [lessonL3.id]: lessonL3, [lessonL4.id]: lessonL4, [lessonL5.id]: lessonL5, [lessonL6.id]: lessonL6 };
+  const allLessons = { ...localLessons, ...validServer, [lessonL3.id]: lessonL3, [lessonL4.id]: lessonL4, [lessonL5.id]: lessonL5, [lessonL6.id]: lessonL6 };
+  IGNORED_LESSON_IDS.forEach(id => delete allLessons[id]);
   saveStoredLessons(allLessons);
   roomState = { ...baseState(), ...val, lessons: allLessons };
   notify();
@@ -277,30 +274,32 @@ function getAllLessons(state) {
     const serverItems = Array.isArray(server) ? server : Object.values(server);
     serverItems.forEach(item => {
       if (item && item.id && item.title && Array.isArray(item.words) && item.words.length > 0) {
+        if (IGNORED_LESSON_IDS.has(item.id)) return;
+        if (item.id.startsWith('lesson_') && item.words.length < 5) return;
         validMap[item.id] = item;
       }
     });
   }
-  validMap[defaultLesson.id] = defaultLesson;
+  IGNORED_LESSON_IDS.forEach(id => delete validMap[id]);
   validMap[lessonL3.id] = lessonL3;
   validMap[lessonL4.id] = lessonL4;
   validMap[lessonL5.id] = lessonL5;
   validMap[lessonL6.id] = lessonL6;
 
   const list = Object.values(validMap);
-  return list.length ? list : [defaultLesson, lessonL3, lessonL4, lessonL5, lessonL6];
+  return list.length ? list : [lessonL3, lessonL4, lessonL5, lessonL6];
 }
 
 function getActiveLesson(state) {
   const s = state || read();
   const all = getAllLessons(s);
   const targetId = s?.currentLessonId;
-  return all.find(l => l.id === targetId) || all.find(l => l.id === 'l5') || all.find(l => l.id === 'l6') || all.find(l => l.id === 'l4') || all.find(l => l.id === 'l3') || all.find(l => l.id === 'l2') || all[0] || lessonL5;
+  return all.find(l => l.id === targetId) || all.find(l => l.id === 'l5') || all.find(l => l.id === 'l6') || all.find(l => l.id === 'l4') || all.find(l => l.id === 'l3') || all[0] || lessonL5;
 }
 
 function activeWord(state) {
   const lesson = getActiveLesson(state);
-  const words = (lesson && Array.isArray(lesson.words) && lesson.words.length) ? lesson.words : defaultLesson.words;
+  const words = (lesson && Array.isArray(lesson.words) && lesson.words.length) ? lesson.words : lessonL3.words;
   const idx = (state && state.wordIndex >= 0 && state.wordIndex < words.length) ? state.wordIndex : 0;
   return words[idx] || words[0];
 }
@@ -561,11 +560,11 @@ function teacherApp() {
     }
 
     let activeLesson = getActiveLesson(s);
-    if (activeLesson && activeLesson.id.startsWith('lesson_') && activeLesson.words.length <= 4 && lessons.some(l => l.id === 'l4')) {
-      s.currentLessonId = 'l4';
+    if (!activeLesson || IGNORED_LESSON_IDS.has(activeLesson.id) || (activeLesson.id.startsWith('lesson_') && activeLesson.words.length <= 4)) {
+      s.currentLessonId = 'l5';
       s.wordIndex = 0;
       write(s);
-      activeLesson = lessons.find(l => l.id === 'l4');
+      activeLesson = lessons.find(l => l.id === 'l5') || lessons[0];
     }
 
     if (activeLesson && lessons.some(l => l.id === activeLesson.id)) {
@@ -578,7 +577,7 @@ function teacherApp() {
   function populateWords() {
     const s = read();
     const lesson = getActiveLesson(s);
-    const words = (lesson && Array.isArray(lesson.words) && lesson.words.length) ? lesson.words : defaultLesson.words;
+    const words = (lesson && Array.isArray(lesson.words) && lesson.words.length) ? lesson.words : lessonL3.words;
     if (!words || !words.length) return;
 
     const html = words.map((w, i) => `<option value="${i}">【${w?.char || '?'}】字生字配對 (${(w?.terms || []).length}詞)</option>`).join('');
