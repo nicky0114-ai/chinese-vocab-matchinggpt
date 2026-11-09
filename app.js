@@ -113,13 +113,39 @@ const lessonL6 = {
   ]
 };
 
+const lessonL7 = {
+  id: 'l7',
+  title: '六年級國語 L7',
+  words: [
+    {char:'勞',terms:[['勞動','付出體力或腦力以從事工作。'],['勤勞','努力工作，不偷懶鬆懈。'],['辛勞','辛苦勞累。'],['疲勞','因過度消耗體力或精神而感到困倦憊弱。'],['慰勞','以言語或物資慰問辛苦工作或立功的人。'],['任勞任怨','任，承受、擔當。做事能承受勞苦，也能承受別人的埋怨而不退縮。']]},
+    {char:'抉',terms:[['抉擇','經過深思熟慮後所作出的挑選與決定。'],['抉挑','挑選、選拔人才。'],['抉摘','摘取挑選，或指揭發指出缺失弊病。'],['抉剔','剔除雜質、排除壞的留存好的。'],['鉤抉','深入探索、挖掘深奧的事理。']]},
+    {char:'擇',terms:[['選擇','挑選。'],['抉擇','挑選判定。'],['物競天擇','大自然對生物適者生存的淘汰篩選法則。'],['擇優','挑選最優秀的。'],['擇期','挑選合適的日期。'],['擇善固執','選擇正確、良善的事物，並堅定不移地實踐到底。']]},
+    {char:'跆',terms:[['跆拳','踢踏、踐踏，也指以腳踢為主的防衛招式。'],['跆拳道','源自朝鮮半島、強調以腳部踢擊為主的傳統現代體育武術。'],['跆擊','以腿部快速踢擊對手得分的動作。'],['跆踐','踩踏、踐踏地面或物體。']]},
+    {char:'抽',terms:[['抽象','不具體、抽取本質特徵而非具體形態的思維概念。'],['抽屜','桌子或櫥櫃中可拉出推入以盛放物件的箱型木盒。'],['抽空','在忙碌中擠出時間。'],['抽查','從全體對象中隨機挑選一部分進行檢驗。'],['抽籤','抽取籤條以公平決定順序或人選。'],['抽絲剝繭','比喻依照線索細密有序地推敲分析，逐步追查出事實真相。']]},
+    {char:'叢',terms:[['叢林','樹木茂密聚集的廣大森林。'],['草叢','聚生密茂的野草堆。'],['叢生','草木聚集生長，也比喻缺點、弊病繁多紛呈。'],['叢書','依據一定規範與主題整套編輯出版的多冊書籍。'],['叢聚','聚合聚集在一起。'],['叢林法則','弱肉強食、優勝劣汰的殘酷自然競爭規律。']]},
+    {char:'履',terms:[['履行','落實實踐自己答應的諾言、約定或合約義務。'],['履歷','個人學習、工作與經歷的詳細記錄。'],['草履','用稻草編織成的簡便鞋子。'],['履勘','親自到實地勘查考察。'],['如履薄冰','比喻處事極為謹慎小心，戒懼戒恐，唯恐發生差錯。']]},
+    {char:'蹣',terms:[['蹣跚','形容步伐搖晃不穩、走路歪斜緩慢的樣子。'],['蹣步','搖搖晃晃、步伐不穩地走路。'],['蹣行','搖擺前行。'],['步蹣','腳步搖晃蹣跚。'],['步履蹣跚','步履，腳步步伐。形容走路歪歪斜斜、搖晃遲緩的樣子。']]},
+    {char:'跚',terms:[['蹣跚','走路歪斜不穩、搖晃遲緩。'],['跚跚','行走緩慢悠緩的姿態。'],['跚行','緩步搖擺前進。'],['步跚','步伐晃動不穩。'],['跚步','放慢腳步緩行。']]},
+    {char:'灶',terms:[['爐灶','生火煮飯做菜的炊具設施。'],['柴灶','以木柴枯枝作為主要燃料的傳統磚灶。'],['灶神','道教與民間信仰中掌管廚房家事的司命真君神明。'],['掌灶','負責掌廚料理烹調工作。'],['另起爐灶','比喻脫離原來的組織架構，重新開闢全新的局面或另作安排。']]},
+    {char:'搔',terms:[['搔癢','抓抓皮膚以消除止癢感。'],['搔首','抓抓頭髮，多形容焦急苦思冥想的模樣。'],['隔靴搔癢','隔著靴子抓癢。比喻說話或辦事未切中關鍵要點，無法解決核心問題。']]},
+    {char:'壤',terms:[['土壤','陸地表面具肥力、適合植物生長的疏鬆土層。'],['沃壤','肥沃且利於農作物生長的良田泥土。'],['接壤','兩地或兩國在疆界邊緣互相連接近鄰。'],['霄壤','天與地，常比喻差別極端巨大懸殊。'],['天壤之別','天和地之間的距離。比喻兩者之間的差距極為懸殊巨大。']]},
+    {char:'苞',terms:[['花苞','含蕾未放的花朵構造。'],['苞片','生在花序或花梗基部、保護花蕾的葉狀構造。'],['含苞待放','形容花朵含蓄結蕾、即將綻放的優美姿態。也比喻青少年人才潛力無限、蓄勢待發。']]},
+    {char:'芽',terms:[['嫩芽','初生初長出來的鮮綠柔軟葉芽。'],['發芽','種子吸收水分養分後開始萌發新芽苗。'],['萌芽','植物初生發芽，比喻新事物或思潮剛剛產生出現。'],['豆芽','黃豆、綠豆等種子萌發出的幼嫩食用菜芽。'],['胚芽','植物種子內部將來發育成根莖葉的核心構造。'],['枯木生芽','枯乾的樹木重新長出新芽。比喻在絕境中迎來轉機、重獲新生與希望。']]},
+    {char:'衡',terms:[['衡量','評量、考慮判斷各種利弊關係。'],['平衡','各方力量或重心維持均等穩定、不傾斜倒塌。'],['均衡','分佈平均平衡、沒有偏差偏頗。'],['權衡','秤錘與秤桿，引申為細心權度、評估事情利害關鍵。'],['度量衡','衡量長短、容積、輕重的總稱。'],['權衡輕重','仔細評量各項事情的利弊得失與重要急迫程度。']]},
+    {char:'維',terms:[['維護','保護保全，使其免受破壞干擾。'],['維持','保持現狀並使之平穩延續不中斷。'],['維繫','牽繫維持人際情感或組織結構。'],['思維','大腦進行思考分析、推理判斷的心智活動。'],['恭維','刻意說好話討好稱讚他人。'],['進退維谷','谷，比喻困境險阻。向前進或向後退都陷於險境之中。形容進退兩難、處境尷尬困頓。']]},
+    {char:'犧',terms:[['犧牲','為了正義宗旨、國家或他人利益而放棄個人私利甚至生命。'],['犧牲品','為了某種目的而被迫蒙受損害、被捨棄的人事物。']]},
+    {char:'牲',terms:[['牲畜','人類馴養飼育的牛、羊、豬、馬等家畜總稱。'],['牲口','供耕作、馱運或食用的家畜動物。'],['三牲','祭祀神明祖先時必備的豬肉、雞肉、魚肉等三種祭品。'],['犧牲','祭神用的純色整牲，引申為成全大義而付出私利生命。'],['全牲','祭祀所用未加分割切割的整隻牲畜。'],['犧牲小我','放棄個人的小利益或舒適，以成全團體或國家社會的大局目標。']]}
+  ]
+};
+
 const defaultLesson = lessonL3;
 
 const defaultLessons = {
   [lessonL3.id]: lessonL3,
   [lessonL4.id]: lessonL4,
   [lessonL5.id]: lessonL5,
-  [lessonL6.id]: lessonL6
+  [lessonL6.id]: lessonL6,
+  [lessonL7.id]: lessonL7
 };
 
 const IGNORED_LESSON_IDS = new Set(['l2', 'lesson_1790952296280', 'lesson_1792418522445']);
@@ -146,6 +172,7 @@ function getStoredLessons() {
   result[lessonL4.id] = lessonL4;
   result[lessonL5.id] = lessonL5;
   result[lessonL6.id] = lessonL6;
+  result[lessonL7.id] = lessonL7;
   return result;
 }
 
@@ -159,7 +186,7 @@ function baseState() {
   return {
     command: 'waiting',
     groupCount: DEFAULT_GROUPS,
-    currentLessonId: 'l5',
+    currentLessonId: 'l7',
     wordIndex: 0,
     duration: 60,
     endsAt: null,
@@ -170,7 +197,7 @@ function baseState() {
       enabled: true,
       startTime: "08:00",
       endTime: "17:00",
-      allowedLessons: ["l6", "l5", "l4", "l3"]
+      allowedLessons: ["l7", "l6", "l5", "l4", "l3"]
     },
     selfPracticeRecords: {},
     updatedAt: Date.now()
@@ -201,7 +228,7 @@ function write(next) {
   runTransaction(roomRef, current => {
     const prior = current || baseState();
     const shouldClearAnswers = (next.command === 'waiting' || next.command === 'stopped' || (next.command === 'playing' && Object.keys(next.answers || {}).length === 0)) && Object.keys(next.answers || {}).length === 0;
-    const mergedLessons = { ...getStoredLessons(), ...(prior.lessons || {}), ...(next.lessons || {}), [lessonL3.id]: lessonL3, [lessonL4.id]: lessonL4, [lessonL5.id]: lessonL5, [lessonL6.id]: lessonL6 };
+    const mergedLessons = { ...getStoredLessons(), ...(prior.lessons || {}), ...(next.lessons || {}), [lessonL3.id]: lessonL3, [lessonL4.id]: lessonL4, [lessonL5.id]: lessonL5, [lessonL6.id]: lessonL6, [lessonL7.id]: lessonL7 };
     IGNORED_LESSON_IDS.forEach(id => delete mergedLessons[id]);
     return {
       ...prior,
@@ -232,7 +259,7 @@ onValue(roomRef, snapshot => {
       validServer[item.id] = item;
     }
   });
-  const allLessons = { ...localLessons, ...validServer, [lessonL3.id]: lessonL3, [lessonL4.id]: lessonL4, [lessonL5.id]: lessonL5, [lessonL6.id]: lessonL6 };
+  const allLessons = { ...localLessons, ...validServer, [lessonL3.id]: lessonL3, [lessonL4.id]: lessonL4, [lessonL5.id]: lessonL5, [lessonL6.id]: lessonL6, [lessonL7.id]: lessonL7 };
   IGNORED_LESSON_IDS.forEach(id => delete allLessons[id]);
   saveStoredLessons(allLessons);
   roomState = { ...baseState(), ...val, lessons: allLessons };
@@ -285,16 +312,17 @@ function getAllLessons(state) {
   validMap[lessonL4.id] = lessonL4;
   validMap[lessonL5.id] = lessonL5;
   validMap[lessonL6.id] = lessonL6;
+  validMap[lessonL7.id] = lessonL7;
 
   const list = Object.values(validMap);
-  return list.length ? list : [lessonL3, lessonL4, lessonL5, lessonL6];
+  return list.length ? list : [lessonL3, lessonL4, lessonL5, lessonL6, lessonL7];
 }
 
 function getActiveLesson(state) {
   const s = state || read();
   const all = getAllLessons(s);
   const targetId = s?.currentLessonId;
-  return all.find(l => l.id === targetId) || all.find(l => l.id === 'l5') || all.find(l => l.id === 'l6') || all.find(l => l.id === 'l4') || all.find(l => l.id === 'l3') || all[0] || lessonL5;
+  return all.find(l => l.id === targetId) || all.find(l => l.id === 'l7') || all.find(l => l.id === 'l6') || all.find(l => l.id === 'l5') || all.find(l => l.id === 'l4') || all.find(l => l.id === 'l3') || all[0] || lessonL7;
 }
 
 function activeWord(state) {
@@ -916,7 +944,7 @@ function teacherApp() {
 
   function renderSelfPracticeConfigInputs() {
     const s = read();
-    const cfg = s.selfPracticeConfig || { enabled: true, startTime: '08:00', endTime: '17:00', allowedLessons: ['l6', 'l5', 'l4', 'l3', 'l2'] };
+    const cfg = s.selfPracticeConfig || { enabled: true, startTime: '08:00', endTime: '17:00', allowedLessons: ['l7', 'l6', 'l5', 'l4', 'l3'] };
     if (selfPracticeEnabled) selfPracticeEnabled.value = String(cfg.enabled !== false);
     if (selfPracticeStartTime && document.activeElement !== selfPracticeStartTime) selfPracticeStartTime.value = cfg.startTime || '08:00';
     if (selfPracticeEndTime && document.activeElement !== selfPracticeEndTime) selfPracticeEndTime.value = cfg.endTime || '17:00';
@@ -1430,7 +1458,7 @@ function studentApp() {
 
 function practiceApp() {
   let profile = JSON.parse(localStorage.getItem('vocab-self-profile')) || null;
-  let activeLessonId = 'l5';
+  let activeLessonId = 'l7';
   let activeWordIndex = 0;
   let selected = null;
   let termOrder = [];
@@ -1502,7 +1530,7 @@ function practiceApp() {
 
   function render() {
     const s = read();
-    const cfg = s.selfPracticeConfig || { enabled: true, startTime: '08:00', endTime: '17:00', allowedLessons: ['l6', 'l5', 'l4', 'l3', 'l2'] };
+    const cfg = s.selfPracticeConfig || { enabled: true, startTime: '08:00', endTime: '17:00', allowedLessons: ['l7', 'l6', 'l5', 'l4', 'l3'] };
 
     const timeStatusEl = document.querySelector('#timeWindowStatus');
     const now = new Date();
