@@ -283,13 +283,19 @@ function seconds(s) {
 function isGroupOnline(presence, groupId) {
   if (!presence) return false;
   const ts = presence[groupId] ?? presence[String(groupId)] ?? 0;
-  return typeof ts === 'number' && (Date.now() - ts < 25000);
+  if (typeof ts !== 'number' || ts <= 0) return false;
+  const serverNow = Date.now() + (window._serverTimeDelta || 0);
+  const diff = serverNow - ts;
+  return diff < 45000 && diff > -45000;
 }
 
 function isGroupOccupied(occupancy, groupId) {
   if (!occupancy) return false;
   const ts = occupancy[groupId] ?? occupancy[String(groupId)] ?? 0;
-  return typeof ts === 'number' && (Date.now() - ts < 25000);
+  if (typeof ts !== 'number' || ts <= 0) return false;
+  const serverNow = Date.now() + (window._serverTimeDelta || 0);
+  const diff = serverNow - ts;
+  return diff < 45000 && diff > -45000;
 }
 
 function getAllLessons(state) {
@@ -1286,12 +1292,19 @@ function studentApp() {
     dialog.showModal();
   }
 
+  let firebaseConnected = true;
   function presence() {
     if (!group) return;
+    const now = Date.now() + (window._serverTimeDelta || 0);
     const pRef = ref(database, `vocab_rooms/room603/state/presence/${group}`);
     const occRef = ref(database, `vocab_rooms/room603/state/groupOccupancy/${group}`);
-    set(pRef, Date.now()).catch(() => {});
-    set(occRef, Date.now()).catch(() => {});
+    set(pRef, now).then(() => {
+      firebaseConnected = true;
+    }).catch(err => {
+      firebaseConnected = false;
+      console.warn('Firebase presence write failed:', err);
+    });
+    set(occRef, now).catch(() => {});
   }
   setInterval(presence, 3000);
   presence();
@@ -1311,7 +1324,13 @@ function studentApp() {
 
     const statusEl = document.querySelector('#studentStatus');
     if (statusEl) {
-      statusEl.textContent = group ? `第 ${group} 組已連線` : '等待加入小組';
+      if (!group) {
+        statusEl.textContent = '等待加入小組';
+      } else if (!firebaseConnected) {
+        statusEl.textContent = `第 ${group} 組 (連線受阻，點擊檢查)`;
+      } else {
+        statusEl.textContent = `第 ${group} 組已連線`;
+      }
     }
 
     document.querySelector('#wordChips').innerHTML = words.map((x, i) => `<span class="word-chip ${i === s.wordIndex ? 'active' : ''}">${x.char}</span>`).join('');
