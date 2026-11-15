@@ -138,6 +138,32 @@ const lessonL7 = {
   ]
 };
 
+const lessonL8 = {
+  id: 'l8',
+  title: '六年級國語 L8',
+  words: [
+    {char:'怨',terms:[['怨恨','對人或事心懷不滿與憤恨。'],['抱怨','心中不滿而訴說發牢騷。'],['埋怨','因事情不如意而責怪他人或命運。'],['任勞任怨','做事能承受辛勞也能承擔別人的埋怨。'],['以德報怨','不記仇恨，反過來用恩德善待得罪自己的人。']]},
+    {char:'艾',terms:[['艾草','一種具香氣、可用於驅蟲或藥用的多年生草本植物。'],['艾絨','艾葉曬乾揉碎製成的絨絮，常用於灸療法或印泥。'],['方興未艾','形容事物正蓬勃發展，勢頭絲毫沒有停歇。'],['艾葉','艾草的葉片。'],['自怨自艾','原指悔改自己的過錯，後多指自我悔恨與埋怨。']]},
+    {char:'枕',terms:[['枕頭','睡覺時墊在頭頸下的用品。'],['枕木','鋪設在鐵軌下方用以固定軌距、分散壓力的木塊或水泥塊。'],['枕巾','鋪在枕頭上的保護布巾。'],['涼枕','夏天使用、質地清涼透氣的枕頭。'],['枕戈待旦','枕著兵器等待天明，形容時刻保持戒備、隨時準備戰鬥。'],['高枕無憂','墊高枕頭安心睡覺。形容無憂無慮，平安無事。']]},
+    {char:'臂',terms:[['手臂','肩膀到手腕的整個上肢部位。'],['臂膀','手臂與肩膀連接的部位，引申為得力助手。'],['臂力','手臂的肌肉力量。'],['臂章','佩戴在手臂袖子上的徽章或標誌。'],['失之交臂','指錯失機會。']]},
+    {char:'膝',terms:[['膝蓋','大腿與小腿相連的關節部位。'],['屈膝','彎曲膝蓋下跪，比喻屈服投降。'],['膝下','膝蓋之下，借指父母身邊或指幼小的子女。'],['膝跳','敲擊膝蓋韌帶引起的反射性踢腿動作。'],['促膝長談','膝蓋靠著膝蓋談話。形容雙方親切深談，相談甚歡。']]},
+    {char:'焰',terms:[['火焰','燃燒時發出的光和熱氣。'],['氣焰','傲慢囂張的氣勢。'],['烈焰','熾熱猛烈的大火。'],['焰火','煙火，燃放時發出五彩光芒的火花。'],['氣焰囂張','形容人氣勢傲慢狂妄，極端放肆放縱。']]},
+    {char:'熄',terms:[['熄滅','火焰停止燃燒，或燈火滅掉。'],['熄火','引擎停止運轉，或爐火滅掉。'],['熄燈','關掉電燈或吹滅燈火。'],['漸熄','火光或聲響漸漸減弱平息。'],['煙消火熄','比喻紛爭、禍患或風波徹底平息消失。']]},
+    {char:'惱',terms:[['煩惱','心中煩亂憂愁。'],['苦惱','因遭遇困難不如意而感到痛苦鬱悶。'],['惱怒','氣惱憤怒。'],['惹惱','招引觸怒他人。'],['惱羞成怒','因羞愧難堪而轉化為極度的憤怒。']]},
+    {char:'跌',terms:[['跌倒','身體失衡摔在地上。'],['跌落','從高處掉落，也比喻名次或聲譽急劇下滑。'],['跌價','價格大幅下降。'],['跌跤','失足摔倒，也比喻在生活或事業上遭受挫折。'],['跌破眼鏡','比喻出人意料的結果，讓人大吃一驚。']]},
+    {char:'鬚',terms:[['鬍鬚','生長在下巴、嘴唇周圍與臉頰上的毛髮。'],['觸鬚','某些昆蟲或水生動物頭部具感覺功能的細長毛狀物。'],['龍鬚','傳說中龍的鬍鬚，也指一種常見的野菜。'],['鬚毛','動物或植物身上的細長毛狀構造。'],['巾幗鬚眉','巾幗指女性，鬚眉指男性。形容女子具有男子的剛烈氣魄與非凡作為。']]},
+    {char:'剝',terms:[['剝奪','依法或以強權取消、奪去原有的權利資格。'],['剝削','憑藉權力或不正當手段掠奪他人的勞動成果。'],['剝落','表層物體乾裂脫落。'],['剝皮','除去果皮、樹皮或外層表皮。'],['抽絲剝繭','比喻依照線索細密有序地推敲分析，逐步追查出事實真相。']]},
+    {char:'竄',terms:[['逃竄','驚慌失措地四處奔逃躲避。'],['竄改','暗中改動文字、數據以作弊欺騙。'],['抱頭鼠竄','形容極端狼狽恐懼地逃跑。'],['流竄','到處亂跑、沒有固定方向地逃避躲藏。']]},
+    {char:'瞬',terms:[['瞬間','極短暫的一剎那時間。'],['轉瞬','轉動眼珠的短暫片刻，形容時間過得極快。'],['瞬息','眨眼或呼吸一次的片刻時光。'],['瞬變','在極短時間內發生急劇變化。'],['瞬息萬變','在極短的時間內產生千變萬化的變化。形容形勢變化極其迅速。']]},
+    {char:'頹',terms:[['頹廢','意志消沉、頹靡不思進取。'],['頹喪','精神委靡、失落沮喪。'],['頹勢','衰落走下坡的勢頭。'],['頹然','衰弱無力、沮喪垂頭的樣子。'],['坍頹','建築物倒塌破敗。'],['頹垣斷壁','倒塌殘破的牆壁。形容建築荒涼殘破的景象。']]},
+    {char:'熾',terms:[['熾熱','溫度極高、熱度極強，也形容感情熱烈。'],['熾烈','火勢猛烈旺盛，或指戰事競爭激烈。'],['繁熾','繁多興旺。'],['熾盛','強盛興盛。'],['心如火熾','內心像燃燒著烈火一般。形容情緒急切渴望或極度焦躁。']]},
+    {char:'炭',terms:[['木炭','木材經高溫乾餾後製成的固體燃料。'],['炭火','燃燒中的木炭火球。'],['活性炭','具高度微孔吸附功能的特殊碳質材料。'],['生靈塗炭','形容人民處於極端艱苦的困境。'],['雪中送炭','在寒冬下雪時送木炭給人取暖。比喻在他人急難困頓時及時給予幫助。']]},
+    {char:'飢',terms:[['畫餅充飢','比喻徒具虛名而無益於實際。'],['飢渴','飢餓與口渴，也比喻求知或某種渴望極為迫切。'],['飢荒','因自然災害導致糧食極度短缺。'],['飢民','遭受飢荒、缺少食物的災民。'],['飢腸轆轆','肚子餓得發出咕嚕咕嚕的響聲。'],['飢不擇食','飢餓時顧不得挑選食物好壞。比喻迫切需要時顧不得選擇挑剔。']]},
+    {char:'裊',terms:[['裊裊','煙氣輕柔旋轉上升的樣子，或形容歌聲柔美迴旋。'],['裊娜','形容女子體態或花木枝條輕盈柔美搖曳。'],['裊婷','體態輕柔優美的樣子。'],['炊煙裊裊','傍晚做飯時，煙囪冒出的輕煙緩緩繚繞上升。形容農村安詳寧靜的生活景象。']]},
+    {char:'緒',terms:[['情緒','人對客觀事物所產生的心理喜怒哀樂狀態。'],['思緒','思想頭緒與思考脈絡。'],['頭緒','事情的端倪、開端或線索。'],['愁緒','憂愁悲傷的心緒。'],['千頭萬緒','比喻事情紛繁複雜，難以理清開端與端倪。']]}
+  ]
+};
+
 const defaultLesson = lessonL3;
 
 const defaultLessons = {
@@ -145,7 +171,8 @@ const defaultLessons = {
   [lessonL4.id]: lessonL4,
   [lessonL5.id]: lessonL5,
   [lessonL6.id]: lessonL6,
-  [lessonL7.id]: lessonL7
+  [lessonL7.id]: lessonL7,
+  [lessonL8.id]: lessonL8
 };
 
 const IGNORED_LESSON_IDS = new Set(['l2', 'lesson_1790952296280', 'lesson_1792418522445']);
@@ -173,6 +200,7 @@ function getStoredLessons() {
   result[lessonL5.id] = lessonL5;
   result[lessonL6.id] = lessonL6;
   result[lessonL7.id] = lessonL7;
+  result[lessonL8.id] = lessonL8;
   return result;
 }
 
@@ -186,7 +214,7 @@ function baseState() {
   return {
     command: 'waiting',
     groupCount: DEFAULT_GROUPS,
-    currentLessonId: 'l7',
+    currentLessonId: 'l8',
     wordIndex: 0,
     duration: 60,
     endsAt: null,
@@ -197,7 +225,7 @@ function baseState() {
       enabled: true,
       startTime: "08:00",
       endTime: "17:00",
-      allowedLessons: ["l7", "l6", "l5", "l4", "l3"]
+      allowedLessons: ["l8", "l7", "l6", "l5", "l4", "l3"]
     },
     selfPracticeRecords: {},
     updatedAt: Date.now()
@@ -228,7 +256,7 @@ function write(next) {
   runTransaction(roomRef, current => {
     const prior = current || baseState();
     const shouldClearAnswers = (next.command === 'waiting' || next.command === 'stopped' || (next.command === 'playing' && Object.keys(next.answers || {}).length === 0)) && Object.keys(next.answers || {}).length === 0;
-    const mergedLessons = { ...getStoredLessons(), ...(prior.lessons || {}), ...(next.lessons || {}), [lessonL3.id]: lessonL3, [lessonL4.id]: lessonL4, [lessonL5.id]: lessonL5, [lessonL6.id]: lessonL6, [lessonL7.id]: lessonL7 };
+    const mergedLessons = { ...getStoredLessons(), ...(prior.lessons || {}), ...(next.lessons || {}), [lessonL3.id]: lessonL3, [lessonL4.id]: lessonL4, [lessonL5.id]: lessonL5, [lessonL6.id]: lessonL6, [lessonL7.id]: lessonL7, [lessonL8.id]: lessonL8 };
     IGNORED_LESSON_IDS.forEach(id => delete mergedLessons[id]);
     return {
       ...prior,
@@ -259,7 +287,7 @@ onValue(roomRef, snapshot => {
       validServer[item.id] = item;
     }
   });
-  const allLessons = { ...localLessons, ...validServer, [lessonL3.id]: lessonL3, [lessonL4.id]: lessonL4, [lessonL5.id]: lessonL5, [lessonL6.id]: lessonL6, [lessonL7.id]: lessonL7 };
+  const allLessons = { ...localLessons, ...validServer, [lessonL3.id]: lessonL3, [lessonL4.id]: lessonL4, [lessonL5.id]: lessonL5, [lessonL6.id]: lessonL6, [lessonL7.id]: lessonL7, [lessonL8.id]: lessonL8 };
   IGNORED_LESSON_IDS.forEach(id => delete allLessons[id]);
   saveStoredLessons(allLessons);
   roomState = { ...baseState(), ...val, lessons: allLessons };
@@ -319,16 +347,17 @@ function getAllLessons(state) {
   validMap[lessonL5.id] = lessonL5;
   validMap[lessonL6.id] = lessonL6;
   validMap[lessonL7.id] = lessonL7;
+  validMap[lessonL8.id] = lessonL8;
 
   const list = Object.values(validMap);
-  return list.length ? list : [lessonL3, lessonL4, lessonL5, lessonL6, lessonL7];
+  return list.length ? list : [lessonL3, lessonL4, lessonL5, lessonL6, lessonL7, lessonL8];
 }
 
 function getActiveLesson(state) {
   const s = state || read();
   const all = getAllLessons(s);
   const targetId = s?.currentLessonId;
-  return all.find(l => l.id === targetId) || all.find(l => l.id === 'l7') || all.find(l => l.id === 'l6') || all.find(l => l.id === 'l5') || all.find(l => l.id === 'l4') || all.find(l => l.id === 'l3') || all[0] || lessonL7;
+  return all.find(l => l.id === targetId) || all.find(l => l.id === 'l8') || all.find(l => l.id === 'l7') || all.find(l => l.id === 'l6') || all.find(l => l.id === 'l5') || all.find(l => l.id === 'l4') || all.find(l => l.id === 'l3') || all[0] || lessonL8;
 }
 
 function activeWord(state) {
@@ -950,7 +979,7 @@ function teacherApp() {
 
   function renderSelfPracticeConfigInputs() {
     const s = read();
-    const cfg = s.selfPracticeConfig || { enabled: true, startTime: '08:00', endTime: '17:00', allowedLessons: ['l7', 'l6', 'l5', 'l4', 'l3'] };
+    const cfg = s.selfPracticeConfig || { enabled: true, startTime: '08:00', endTime: '17:00', allowedLessons: ['l8', 'l7', 'l6', 'l5', 'l4', 'l3'] };
     if (selfPracticeEnabled) selfPracticeEnabled.value = String(cfg.enabled !== false);
     if (selfPracticeStartTime && document.activeElement !== selfPracticeStartTime) selfPracticeStartTime.value = cfg.startTime || '08:00';
     if (selfPracticeEndTime && document.activeElement !== selfPracticeEndTime) selfPracticeEndTime.value = cfg.endTime || '17:00';
@@ -1477,7 +1506,7 @@ function studentApp() {
 
 function practiceApp() {
   let profile = JSON.parse(localStorage.getItem('vocab-self-profile')) || null;
-  let activeLessonId = 'l7';
+  let activeLessonId = 'l8';
   let activeWordIndex = 0;
   let selected = null;
   let termOrder = [];
@@ -1549,7 +1578,7 @@ function practiceApp() {
 
   function render() {
     const s = read();
-    const cfg = s.selfPracticeConfig || { enabled: true, startTime: '08:00', endTime: '17:00', allowedLessons: ['l7', 'l6', 'l5', 'l4', 'l3'] };
+    const cfg = s.selfPracticeConfig || { enabled: true, startTime: '08:00', endTime: '17:00', allowedLessons: ['l8', 'l7', 'l6', 'l5', 'l4', 'l3'] };
 
     const timeStatusEl = document.querySelector('#timeWindowStatus');
     const now = new Date();
