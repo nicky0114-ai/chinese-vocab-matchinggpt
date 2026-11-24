@@ -164,6 +164,32 @@ const lessonL8 = {
   ]
 };
 
+const lessonL9 = {
+  id: 'l9',
+  title: '六年級國語 L9',
+  words: [
+    {char:'懸',terms:[['懸掛','高高掛在空中或牆上。'],['懸念','心中掛念擔憂。'],['懸殊','相差極大，距離很遠。'],['懸崖','高聳陡峭的山崖石壁。'],['懸賞','用重金或其他代價徵求破案線索或尋找人事物。'],['懸崖勒馬','在懸崖邊緣勒住馬繮。比喻到了極其危險的邊緣時，及時省悟回頭。']]},
+    {char:'寡',terms:[['寡言','平時說話很少。'],['寡婦','死了丈夫的婦女。'],['多寡','數量的多少。'],['清心寡欲','心情清靜，極少貪求欲念。'],['優柔寡斷','做事猶豫不決，缺乏果斷力。'],['寡不敵眾','人數少的一方敵不過人數多的一方。']]},
+    {char:'勃',terms:[['蓬勃','旺盛繁榮的樣子。'],['生機勃勃','充滿生命力與活力的熱鬧景象。'],['勃然大怒','突然大發脾氣，極度憤怒。'],['雄心勃勃','抱負遠大，精神振奮。']]},
+    {char:'棍',terms:[['木棍','木質的棍棒。'],['惡棍','欺壓百姓、品行惡劣的流氓無賴。'],['拐棍','供年老或行動不便者支撐走路的拐杖。'],['警棍','警察執勤時隨身配備的防衛器具。'],['一棍打死','比喻不加分析與區別，一概予以否定或嚴厲打擊。']]},
+    {char:'糧',terms:[['糧食','人維持生命所食用的米、麥、雜糧等食物總稱。'],['糧草','古代軍隊中士兵的口糧與戰馬飼草。'],['彈盡糧絕','子彈打光，糧食吃盡。形容處境極其艱困絕望。'],['乾糧','便於攜帶保存的乾燥熟食乾點。']]},
+    {char:'顛',terms:[['顛倒','上下、前後或是非位置翻轉混淆。'],['顛簸','上下劇烈震盪搖晃。'],['顛沛','流離失所，生活困頓艱難。'],['顛峰','山峰最高處，比喻事物達到的最高極致狀態。'],['神魂顛倒','心神迷亂，不能自主。'],['顛倒是非','顛倒黑白，混淆對錯。把對的說成錯的，錯的說成對的。']]},
+    {char:'簸',terms:[['顛簸','上下劇烈震動搖擺。'],['簸弄','擺布、搖動，引申為搬弄是非。'],['簸揚','搖動器具使米穀上下拋動以除糠屑雜物。'],['簸箕','用竹篾或藤條編成用以揚糠或掃除垃圾的器具。']]},
+    {char:'獻',terms:[['貢獻','對國家、社會或集體事業所付出的力量與成果。'],['奉獻','恭敬地供奉、無私地付出。'],['獻策','提出謀略與好建議。'],['借花獻佛','拿別人的東西來討好做人情。']]},
+    {char:'艘',terms:[['船艘','船隻的統稱。'],['百艘競發','形容許多船隻同時揚帆出發的壯觀場面。'],['彩艘','裝飾華美五彩的遊賞船隻。'],['龍艘','華麗的皇帝座船或龍舟賽艇。']]},
+    {char:'鎖',terms:[['門鎖','裝在門上的防護鎖具。'],['枷鎖','古代套在犯人頸部與手上的刑具，比喻束縛。'],['鎖定','緊密跟蹤並固定目標不放。'],['封鎖','切斷通道或聯繫，阻絕外界往來。'],['名韁利鎖','比喻人受名利的羈絆而不得自由。']]},
+    {char:'策',terms:[['政策','國家或政黨為達到一定目標所制定的行動方針與規範。'],['策略','為達成特定目的所採取的具體計謀方法。'],['決策','決定重大策略方針的心智過程。'],['計策','計謀與策略方案。'],['束手無策','捆綁雙手般毫無辦法應對。'],['群策群力','聚合眾人的智慧和能力。']]},
+    {char:'否',terms:[['否定','表示不認可、不贊同。'],['否認','不承認事實。'],['否決','在會議中表決不予通過。'],['否極泰來','逆境壞運到了極點，好運勢便隨之而來。'],['不置可否','形容不表示任何意見。']]},
+    {char:'欠',terms:[['虧欠','在道義、金錢或人情上對不起他人。'],['欠缺','缺少、不足夠。'],['拖欠','拖延延宕、未按期清償。'],['哈欠','疲勞或缺氧時張口深呼吸排氣的生理反應。']]},
+    {char:'江',terms:[['江河','大河川的總稱。'],['長江','發源自青藏高原、流入東海的中國第一大河。'],['江山','江河與山岳，引申借指國家的領土政權。'],['江郎才盡','比喻文思衰竭或才華退步大不如前。'],['江河日下','比喻情況日漸敗壞。']]},
+    {char:'瀰',terms:[['瀰漫','煙霧、氣味或氛圍充滿擴散在整個空間中。'],['煙霧瀰漫','煙氣濃霧瀰散充斥在四周。'],['瀰天','滿天、廣布於天地之間。']]},
+    {char:'倉',terms:[['倉庫','儲存各類貨品、物資的專用庫房建築。'],['倉促','時間急迫匆忙，來不及從容準備。'],['倉皇失措','匆忙慌張，不知如何是好。'],['穀倉','專門存放收割稻穀的儲藏室。'],['暗度陳倉','比喻出其不意、從旁突擊的戰略。後比喻暗中進行的活動。']]},
+    {char:'鞏',terms:[['鞏固','堅固牢靠，不易動搖破壞。'],['鞏膜','眼球最外層由緻密結締組織構成的白色保護膜。']]},
+    {char:'固',terms:[['固定','穩定不移動，或約定不變更。'],['堅固','結實牢固，不容易損壞破裂。'],['固執','堅持自己的想法不肯變通。'],['固然','雖然如此。'],['凝固','液體冷卻或發生反應變成固體。'],['固若金湯','金，金屬城牆；湯，沸騰的熱水護城河。形容防禦防線無比堅固，難以攻破摧毀。']]},
+    {char:'鼎',terms:[['鼎立','三方力量如同三足鼎立般勢均力敵。'],['鼎盛','興盛旺盛到了最高極致。'],['人聲鼎沸','形容人群會聚喧譁。'],['大名鼎鼎','形容人的名氣聲望很大。'],['一言九鼎','一句話的分量如同九隻大鼎一樣沉重。比喻說話極有分量，信用卓著、一諾千金。']]}
+  ]
+};
+
 const defaultLesson = lessonL3;
 
 const defaultLessons = {
@@ -172,7 +198,8 @@ const defaultLessons = {
   [lessonL5.id]: lessonL5,
   [lessonL6.id]: lessonL6,
   [lessonL7.id]: lessonL7,
-  [lessonL8.id]: lessonL8
+  [lessonL8.id]: lessonL8,
+  [lessonL9.id]: lessonL9
 };
 
 const IGNORED_LESSON_IDS = new Set(['l2', 'lesson_1790952296280', 'lesson_1792418522445']);
@@ -201,6 +228,7 @@ function getStoredLessons() {
   result[lessonL6.id] = lessonL6;
   result[lessonL7.id] = lessonL7;
   result[lessonL8.id] = lessonL8;
+  result[lessonL9.id] = lessonL9;
   return result;
 }
 
@@ -214,7 +242,7 @@ function baseState() {
   return {
     command: 'waiting',
     groupCount: DEFAULT_GROUPS,
-    currentLessonId: 'l8',
+    currentLessonId: 'l9',
     wordIndex: 0,
     duration: 60,
     endsAt: null,
@@ -225,7 +253,7 @@ function baseState() {
       enabled: true,
       startTime: "08:00",
       endTime: "17:00",
-      allowedLessons: ["l8", "l7", "l6", "l5", "l4", "l3"]
+      allowedLessons: ["l9", "l8", "l7", "l6", "l5", "l4", "l3"]
     },
     selfPracticeRecords: {},
     updatedAt: Date.now()
@@ -256,7 +284,7 @@ function write(next) {
   runTransaction(roomRef, current => {
     const prior = current || baseState();
     const shouldClearAnswers = (next.command === 'waiting' || next.command === 'stopped' || (next.command === 'playing' && Object.keys(next.answers || {}).length === 0)) && Object.keys(next.answers || {}).length === 0;
-    const mergedLessons = { ...getStoredLessons(), ...(prior.lessons || {}), ...(next.lessons || {}), [lessonL3.id]: lessonL3, [lessonL4.id]: lessonL4, [lessonL5.id]: lessonL5, [lessonL6.id]: lessonL6, [lessonL7.id]: lessonL7, [lessonL8.id]: lessonL8 };
+    const mergedLessons = { ...getStoredLessons(), ...(prior.lessons || {}), ...(next.lessons || {}), [lessonL3.id]: lessonL3, [lessonL4.id]: lessonL4, [lessonL5.id]: lessonL5, [lessonL6.id]: lessonL6, [lessonL7.id]: lessonL7, [lessonL8.id]: lessonL8, [lessonL9.id]: lessonL9 };
     IGNORED_LESSON_IDS.forEach(id => delete mergedLessons[id]);
     return {
       ...prior,
@@ -287,7 +315,7 @@ onValue(roomRef, snapshot => {
       validServer[item.id] = item;
     }
   });
-  const allLessons = { ...localLessons, ...validServer, [lessonL3.id]: lessonL3, [lessonL4.id]: lessonL4, [lessonL5.id]: lessonL5, [lessonL6.id]: lessonL6, [lessonL7.id]: lessonL7, [lessonL8.id]: lessonL8 };
+  const allLessons = { ...localLessons, ...validServer, [lessonL3.id]: lessonL3, [lessonL4.id]: lessonL4, [lessonL5.id]: lessonL5, [lessonL6.id]: lessonL6, [lessonL7.id]: lessonL7, [lessonL8.id]: lessonL8, [lessonL9.id]: lessonL9 };
   IGNORED_LESSON_IDS.forEach(id => delete allLessons[id]);
   saveStoredLessons(allLessons);
   roomState = { ...baseState(), ...val, lessons: allLessons };
@@ -348,16 +376,17 @@ function getAllLessons(state) {
   validMap[lessonL6.id] = lessonL6;
   validMap[lessonL7.id] = lessonL7;
   validMap[lessonL8.id] = lessonL8;
+  validMap[lessonL9.id] = lessonL9;
 
   const list = Object.values(validMap);
-  return list.length ? list : [lessonL3, lessonL4, lessonL5, lessonL6, lessonL7, lessonL8];
+  return list.length ? list : [lessonL3, lessonL4, lessonL5, lessonL6, lessonL7, lessonL8, lessonL9];
 }
 
 function getActiveLesson(state) {
   const s = state || read();
   const all = getAllLessons(s);
   const targetId = s?.currentLessonId;
-  return all.find(l => l.id === targetId) || all.find(l => l.id === 'l8') || all.find(l => l.id === 'l7') || all.find(l => l.id === 'l6') || all.find(l => l.id === 'l5') || all.find(l => l.id === 'l4') || all.find(l => l.id === 'l3') || all[0] || lessonL8;
+  return all.find(l => l.id === targetId) || all.find(l => l.id === 'l9') || all.find(l => l.id === 'l8') || all.find(l => l.id === 'l7') || all.find(l => l.id === 'l6') || all.find(l => l.id === 'l5') || all.find(l => l.id === 'l4') || all.find(l => l.id === 'l3') || all[0] || lessonL9;
 }
 
 function activeWord(state) {
@@ -979,7 +1008,7 @@ function teacherApp() {
 
   function renderSelfPracticeConfigInputs() {
     const s = read();
-    const cfg = s.selfPracticeConfig || { enabled: true, startTime: '08:00', endTime: '17:00', allowedLessons: ['l8', 'l7', 'l6', 'l5', 'l4', 'l3'] };
+    const cfg = s.selfPracticeConfig || { enabled: true, startTime: '08:00', endTime: '17:00', allowedLessons: ['l9', 'l8', 'l7', 'l6', 'l5', 'l4', 'l3'] };
     if (selfPracticeEnabled) selfPracticeEnabled.value = String(cfg.enabled !== false);
     if (selfPracticeStartTime && document.activeElement !== selfPracticeStartTime) selfPracticeStartTime.value = cfg.startTime || '08:00';
     if (selfPracticeEndTime && document.activeElement !== selfPracticeEndTime) selfPracticeEndTime.value = cfg.endTime || '17:00';
@@ -1506,7 +1535,7 @@ function studentApp() {
 
 function practiceApp() {
   let profile = JSON.parse(localStorage.getItem('vocab-self-profile')) || null;
-  let activeLessonId = 'l8';
+  let activeLessonId = 'l9';
   let activeWordIndex = 0;
   let selected = null;
   let termOrder = [];
@@ -1578,7 +1607,7 @@ function practiceApp() {
 
   function render() {
     const s = read();
-    const cfg = s.selfPracticeConfig || { enabled: true, startTime: '08:00', endTime: '17:00', allowedLessons: ['l8', 'l7', 'l6', 'l5', 'l4', 'l3'] };
+    const cfg = s.selfPracticeConfig || { enabled: true, startTime: '08:00', endTime: '17:00', allowedLessons: ['l9', 'l8', 'l7', 'l6', 'l5', 'l4', 'l3'] };
 
     const timeStatusEl = document.querySelector('#timeWindowStatus');
     const now = new Date();
